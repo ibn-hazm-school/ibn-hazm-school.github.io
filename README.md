@@ -2,6 +2,6 @@
 
 مدرسة ابن حزم – الحلقة الثانية والثالثة.
 
-الرابط: https://mrramzy1510-bit.github.io/ibnhazm-exams/
+الرابط: https://ibn-hazm-school.github.io/
 
 دليل التشغيل: docs/دليل_التشغيل.md
