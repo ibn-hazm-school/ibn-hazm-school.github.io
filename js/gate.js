@@ -9,6 +9,19 @@ function pick(r) {
   try { sessionStorage.setItem('gate.role', r); } catch (_) {}
 }
 $$('.role').forEach(b => b.onclick = () => pick(b.dataset.role));
+$$('[data-go]').forEach(b => b.onclick = () => pick(b.dataset.go));
+// عربي / English
+const termText = (t, l) => l === 'en' ? t : 'لل' + Catalog.TERM_AR[t].replace(/^ال/, '');
+function setLang(l) {
+  document.documentElement.lang = l; document.documentElement.dir = l === 'en' ? 'ltr' : 'rtl';
+  $$('.lang button').forEach(b => b.classList.toggle('on', b.dataset.lang === l));
+  $$('[data-en]').forEach(el => { if (el.dataset.ar == null) el.dataset.ar = el.textContent; el.textContent = l === 'en' ? el.dataset.en : el.dataset.ar; });
+  $$('[data-en-ph]').forEach(el => { if (el.dataset.arPh == null) el.dataset.arPh = el.placeholder; el.placeholder = l === 'en' ? el.dataset.enPh : el.dataset.arPh; });
+  const tb = $('#termBadge'); if (tb && tb.dataset.term) tb.textContent = termText(tb.dataset.term, l);
+  try { localStorage.setItem('ihz.lang', l); } catch (_) {}
+}
+$$('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang));
+try { if (localStorage.getItem('ihz.lang') === 'en') setLang('en'); } catch (_) {}
 try { const r = location.hash === '#staff' ? 'teacher' : sessionStorage.getItem('gate.role'); if (r && $('#f-' + r)) pick(r); } catch (_) {}
 const show = (form, text, kind = 'err') => { $('.msg', form).innerHTML = text ? `<div class="notice ${kind}">${esc(text)}</div>` : ''; };
 const go = r => location.href = { student: 'student.html', guest: 'student.html', teacher: 'teacher.html', admin: 'admin.html' }[r];
@@ -18,8 +31,8 @@ const s = API.session();
 if (s && s.role) go(s.role);
 
 API.settings().then(st => {
-  $('#termBadge').textContent = `${Catalog.TERM_AR[st.term]} · العام الدراسي ${APP_CONFIG.academicYear}`;
-  if (!st.guest) { $('[data-role=guest]').classList.add('hidden'); if ($('#f-guest').classList.contains('on')) pick('student'); }
+  const tb = $('#termBadge'); tb.dataset.term = st.term; tb.textContent = termText(st.term, document.documentElement.lang);
+  if (!st.guest) { $$('[data-go=guest]').forEach(x => x.classList.add('hidden')); if ($('#f-guest').classList.contains('on')) pick('student'); }
 }).catch(() => {});
 if (API.mode === 'local') $('#modeNote').innerHTML = '<span class="pill gold">وضع التجربة — البيانات محفوظة على هذا الجهاز فقط</span>';
 

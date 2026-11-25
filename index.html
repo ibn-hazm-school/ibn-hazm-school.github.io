@@ -19,73 +19,61 @@
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<main class="gate">
-  <section class="gate-hero">
-    <div class="logo-strip"><img src="assets/logo.png" alt="مدرسة ابن حزم — وزارة التربية والتعليم"></div>
-    <span class="term-badge" id="termBadge">العام الدراسي 2026–2027</span>
-    <h1>منصة <span>ابن حزم</span><br>للتدريب على الاختبارات الإلكترونية</h1>
-    <p class="lead">تدرّب على اختبارات نهاية الفصل للصفوف 5–12 في بيئة تحاكي منصة الاختبار يوم الامتحان: مؤقت، قائمة أسئلة، علامة مراجعة، شطب الخيارات، آلة حاسبة، ونتيجة فورية مع مراجعة الإجابات.</p>
-    <div class="features">
-      <div><span class="ic">⏱️</span><span><b>بيئة الامتحان الحقيقية</b>نفس الأدوات والتوقيت</span></div>
-      <div><span class="ic">✅</span><span><b>نتيجة فورية</b>مع الإجابة الصحيحة لكل سؤال</span></div>
-      <div><span class="ic">🔁</span><span><b>تدرّب بلا حدود</b>وتُحفظ أفضل درجة لك</span></div>
-      <div><span class="ic">📊</span><span><b>متابعة المعلمين</b>تقارير Excel لكل صف وشعبة</span></div>
+<main class="g2">
+  <section class="g2-hero">
+    <div class="g2-logo"><img src="assets/charter.jpg" alt="مدرسة ابن حزم – بالميثاق نبلغ الآفاق"></div>
+    <div class="g2-banner">
+      <h1 data-en="Ibn Hazm Electronic Exam Training Platform">منصة ابن حزم للتدريب على الاختبارات الإلكترونية</h1>
+      <span class="g2-pill" id="termBadge">للفصل الدراسي الأول</span>
+      <p data-en="Practice end-of-term exams for grades 5–12 in the same environment used on exam day – in Arabic and English.">تدرّب على اختبارات نهاية الفصل للصفوف 5–12 في بيئة تحاكي منصة الاختبار يوم الامتحان، بالعربية والإنجليزية.</p>
     </div>
-    <div class="credits">
-      <div><small>مديرة المدرسة</small><b>د. آمنة آل علي</b></div>
-      <div class="by"><small>فكرة وتصميم</small><span>محمد رمزي الحفني</span></div>
+    <div class="g2-cred">
+      <div class="pr"><small data-en="School Principal">مديرة المدرسة</small><b data-en="Dr. Amna Al Ali">د. آمنة آل علي</b></div>
     </div>
+    <div class="g2-school"><span>مدرسة ابن حزم – الحلقة الثانية والثالثة</span><span class="en">Ibn Hazm School – Cycle 2 &amp; 3</span></div>
   </section>
-  <section class="gate-side">
-    <div class="school-name">مدرسة ابن حزم – الحلقة الثانية والثالثة<small>Ibn Hazm School – Cycle 2 &amp; 3</small></div>
-    <div class="card">
-      <div class="tabs" role="tablist">
-        <button class="role on" data-role="student">🎓 الطلاب</button>
-        <button class="role" data-role="guest">🌍 الزوار</button>
-        <button class="role" data-role="teacher">👩‍🏫 المعلمون</button>
-        <button class="role" data-role="admin">🏫 الإدارة</button>
+  <section class="g2-side">
+    <div class="g2-top"><img class="g2-strip" src="assets/logo.png" alt="Ibn Hazm School"><div class="lang"><button type="button" class="on" data-lang="ar">عربي</button><button type="button" data-lang="en">English</button></div></div>
+    <form class="form-panel on" id="f-student" autocomplete="off">
+      <div class="g2-head"><span class="g2-ic">🎓</span><div><h2 data-en="Ibn Hazm Students">طلاب مدرسة ابن حزم</h2><p data-en="Sign in with your student number.">ادخل برقم الطالب.</p></div></div>
+      <label class="f" for="sid" data-en="Student number">رقم الطالب</label>
+      <input class="in ltr big" id="sid" inputmode="numeric" placeholder="مثال: 784200912345678" data-en-ph="e.g. 784200912345678">
+      <div class="hint" data-en="Type the student number exactly as in the school record. Arabic or English digits both work.">اكتب رقم الطالب كما هو في السجل المدرسي، ويمكن استخدام الأرقام العربية أو الإنجليزية.</div>
+      <div class="msg"></div>
+      <button class="btn lg block" data-en="Sign in">دخول</button>
+      <button type="button" class="g2-other" data-go="guest"><span>🌍</span><span data-en="Student from another school? Practice here">طالب من مدرسة أخرى؟ تدرّب من هنا</span></button>
+    </form>
+    <form class="form-panel" id="f-guest" autocomplete="off">
+      <div class="g2-head"><span class="g2-ic">🌍</span><div><h2 data-en="Practice with our exams">تدرّب على امتحاناتنا</h2><p data-en="Enter your name, grade and track. Your results are saved under your name.">اكتب اسمك واختر صفك ومسارك، وتُحفظ نتائجك باسمك.</p></div></div>
+      <label class="f" for="gname" data-en="Your name">اسمك</label>
+      <input class="in" id="gname" placeholder="مثال: أحمد علي" data-en-ph="e.g. Ahmed Ali" maxlength="40">
+      <div class="grid2">
+        <div><label class="f" for="ggrade" data-en="Grade">الصف</label><select class="in" id="ggrade"></select></div>
+        <div><label class="f" for="gtrack" data-en="Track">المسار</label><select class="in" id="gtrack"></select></div>
       </div>
-      <form class="form-panel on" id="f-student" autocomplete="off">
-        <h2>أهلًا بك 👋</h2>
-        <p class="muted" style="margin:0">ادخل برقم الطالب كما هو في السجل المدرسي.</p>
-        <label class="f" for="sid">رقم الطالب</label>
-        <input class="in ltr" id="sid" inputmode="numeric" placeholder="مثال: 784200912345678" style="text-align:center;font-size:1.15em;letter-spacing:.05em">
-        <div class="hint">يمكن كتابة الأرقام بالعربية أو الإنجليزية.</div>
-        <div class="msg"></div>
-        <button class="btn lg block" style="margin-top:12px">دخول</button>
-      </form>
-      <form class="form-panel" id="f-guest" autocomplete="off">
-        <h2>تدرّب على امتحاناتنا</h2>
-        <p class="muted" style="margin:0">اكتب اسمك واختر صفك ومسارك. تُحفظ نتائجك باسمك ولا يراها أحد غيرك.</p>
-        <label class="f" for="gname">اسمك</label>
-        <input class="in" id="gname" placeholder="مثال: أحمد علي" maxlength="40">
-        <div class="grid2">
-          <div><label class="f" for="ggrade">الصف</label><select class="in" id="ggrade"></select></div>
-          <div><label class="f" for="gtrack">المسار</label><select class="in" id="gtrack"></select></div>
-        </div>
-        <div class="msg"></div>
-        <button class="btn lg block gold" style="margin-top:12px">ابدأ التدريب</button>
-      </form>
-      <form class="form-panel" id="f-teacher" autocomplete="off">
-        <h2>بوابة المعلم</h2>
-        <p class="muted" style="margin:0">ارفع امتحانات التدريب وتابع نتائج طلابك.</p>
-        <label class="f" for="tname">اسم المعلم</label>
-        <input class="in" id="tname" placeholder="الاسم الكامل" maxlength="60">
-        <label class="f" for="tpin">رمز المعلمين (4 أرقام)</label>
-        <input class="in ltr" id="tpin" type="password" inputmode="numeric" maxlength="4" style="text-align:center;letter-spacing:.5em;font-size:1.2em">
-        <div class="msg"></div>
-        <button class="btn lg block" style="margin-top:12px">دخول</button>
-      </form>
-      <form class="form-panel" id="f-admin" autocomplete="off">
-        <h2>لوحة الإدارة</h2>
-        <p class="muted" style="margin:0">كل الصفوف والامتحانات والنتائج في مكان واحد.</p>
-        <label class="f" for="apin">رمز الإدارة (4 أرقام)</label>
-        <input class="in ltr" id="apin" type="password" inputmode="numeric" maxlength="4" style="text-align:center;letter-spacing:.5em;font-size:1.2em">
-        <div class="msg"></div>
-        <button class="btn lg block" style="margin-top:12px">دخول</button>
-      </form>
-    </div>
-    <div class="gate-foot">رابط واحد للجميع: الطلاب والزوار والمعلمون والإدارة</div>
+      <div class="msg"></div>
+      <button class="btn lg block" data-en="Start practicing">ابدأ التدريب</button>
+      <button type="button" class="g2-back" data-go="student" data-en="Back to student sign-in">العودة إلى دخول الطلاب</button>
+    </form>
+    <form class="form-panel" id="f-teacher" autocomplete="off">
+      <div class="g2-head"><span class="g2-ic">👩‍🏫</span><div><h2 data-en="Teachers">بوابة المعلمين</h2><p data-en="Upload practice exams and follow your students' results.">ارفع امتحانات التدريب وتابع نتائج طلابك.</p></div></div>
+      <label class="f" for="tname" data-en="Teacher name">اسم المعلم</label>
+      <input class="in" id="tname" placeholder="الاسم الكامل" data-en-ph="Full name" maxlength="60">
+      <label class="f" for="tpin" data-en="Teachers code (4 digits)">رمز المعلمين (4 أرقام)</label>
+      <input class="in ltr pin" id="tpin" type="password" inputmode="numeric" maxlength="4">
+      <div class="msg"></div>
+      <button class="btn lg block" data-en="Sign in">دخول</button>
+      <button type="button" class="g2-back" data-go="student" data-en="Back to student sign-in">العودة إلى دخول الطلاب</button>
+    </form>
+    <form class="form-panel" id="f-admin" autocomplete="off">
+      <div class="g2-head"><span class="g2-ic">🏫</span><div><h2 data-en="Administration">لوحة الإدارة</h2><p data-en="All grades, exams and results in one place.">كل الصفوف والامتحانات والنتائج في مكان واحد.</p></div></div>
+      <label class="f" for="apin" data-en="Admin code (4 digits)">رمز الإدارة (4 أرقام)</label>
+      <input class="in ltr pin" id="apin" type="password" inputmode="numeric" maxlength="4">
+      <div class="msg"></div>
+      <button class="btn lg block" data-en="Sign in">دخول</button>
+      <button type="button" class="g2-back" data-go="student" data-en="Back to student sign-in">العودة إلى دخول الطلاب</button>
+    </form>
+    <div class="g2-staff"><span data-en="Staff:">للعاملين:</span><button type="button" class="role" data-role="teacher" data-en="👩‍🏫 Teachers">👩‍🏫 المعلمون</button><button type="button" class="role" data-role="admin" data-en="🏫 Administration">🏫 الإدارة</button></div>
     <div class="gate-foot" id="modeNote"></div>
   </section>
 </main>
