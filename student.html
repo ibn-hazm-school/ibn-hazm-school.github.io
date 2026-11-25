@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>امتحاناتي · منصة ابن حزم</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main class="wrap">
+  <div class="page-head"><div><h1 id="hello"></h1><p id="helloSub"></p></div></div>
+  <div class="kpis">
+    <div class="kpi"><small>امتحانات متاحة</small><b id="k1">–</b></div>
+    <div class="kpi"><small>امتحانات تدرّبت عليها</small><b id="k2">–</b></div>
+    <div class="kpi"><small>مجموع المحاولات</small><b id="k3">–</b></div>
+    <div class="kpi"><small>متوسط أفضل الدرجات</small><b id="k4">–</b></div>
+  </div>
+  <div class="section-t"><div><h2>امتحانات التدريب المتاحة</h2><p id="availSub"></p></div>
+    <select class="in" id="subj" style="width:auto"></select></div>
+  <div class="exams" id="exams"></div>
+  <div class="section-t"><div><h2>سجل تدريبي</h2><p>كل محاولة أرسلتها في هذا الفصل — اضغط على أي محاولة لمراجعة إجاباتك.</p></div></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>الامتحان</th><th>المادة</th><th class="num">المحاولة</th><th class="num">الدرجة</th><th class="num">النسبة</th><th>النتيجة</th><th class="num">الوقت</th><th>التاريخ</th></tr></thead><tbody id="hist"></tbody></table></div>
+</main>
+<script src="js/config.js"></script><script src="js/catalog.js"></script><script src="js/seed-exams.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script>
+<script>
+(async function () {
+const S = UI.guard('student', 'guest'); UI.header({ home: 'student.html' });
+const { $, esc } = UI;
+const st = await API.settings();
+$('#hello').textContent = S.role === 'student' ? `مرحبًا بك، الطالب رقم ${S.id}` : `مرحبًا بك، ${S.name}`;
+$('#helloSub').textContent = S.role === 'student' ? 'اختر امتحانًا وتدرّب عليه كما تشاء — تُحفظ أفضل درجة لك.' : 'تدرّب كما تشاء — نتائجك محفوظة باسمك ولا يراها أحد غيرك.';
+let exams = [], hist = [];
+try { [exams, hist] = await Promise.all([API.myExams(), API.myAttempts()]); } catch (e) { UI.toast(e.message, 'err'); if (e.code === 'no_session') location.href = 'index.html'; return; }
+const cls = Catalog.classLabel(S.grade, S.track) + (S.section ? ' · شعبة ' + S.section : '');
+$('#availSub').textContent = `${exams.length} امتحان · ${cls} · ${Catalog.TERM_AR[st.term]}`;
+const done = exams.filter(e => e.attempts > 0);
+$('#k1').textContent = exams.length; $('#k2').textContent = done.length; $('#k3').textContent = hist.length;
+$('#k4').textContent = done.length ? Math.round(done.reduce((s, e) => s + e.best, 0) / done.length) + '%' : '–';
+const subs = [...new Set(exams.map(e => e.subject))];
+$('#subj').innerHTML = '<option value="">كل المواد</option>' + subs.map(s => `<option value="${s}">${Catalog.subjAr(s)}</option>`).join('');
+function draw() {
+  const f = $('#subj').value, list = exams.filter(e => !f || e.subject === f);
+  $('#exams').innerHTML = list.length ? list.map(e => `
+    <article class="ex"><div class="hd"><div class="subj"><span class="ico">${Catalog.subjIco(e.subject)}</span>${Catalog.subjAr(e.subject)}</div><h3>${esc(e.title)}</h3></div>
+      <div class="bd"><span class="pill">${e.qcount} سؤال</span><span class="pill">${e.total} درجة</span><span class="pill">${e.duration ? e.duration + ' دقيقة' : 'بلا وقت محدد'}</span>
+        <span class="pill ${e.calculator ? 'ok' : 'grey'}">${e.calculator ? '🧮 الآلة الحاسبة مسموحة' : 'بدون آلة حاسبة'}</span>${e.teacher ? `<span class="pill grey">إعداد: ${esc(e.teacher)}</span>` : ''}</div>
+      <div class="best">${e.attempts ? `أفضل درجة: <b>${e.best}%</b> · ${e.attempts} محاولة<div class="bar"><i style="width:${e.best}%"></i></div>` : '<span class="muted">لم تتدرب عليه بعد</span>'}</div>
+      <div class="ft"><a class="btn" href="exam.html?id=${encodeURIComponent(e.id)}">${UI.ICONS.play}${e.attempts ? 'تدرّب مرة أخرى' : 'ابدأ التدريب'}</a></div></article>`).join('')
+    : '<div class="empty">لم تُنشر امتحانات لصفك في هذا الفصل بعد. عُد قريبًا!</div>';
+}
+$('#subj').onchange = draw; draw();
+$('#hist').innerHTML = hist.length ? hist.map(a => `<tr class="click" data-id="${a.id}"><td>${esc(a.exam_title)}</td><td>${Catalog.subjAr(a.subject)}</td><td class="num">${a.attempt_no}</td><td class="num">${a.score} / ${a.total}</td><td class="num"><b>${a.pct}%</b></td><td>${a.passed ? '<span class="pill ok">ناجح</span>' : '<span class="pill bad">يحتاج تدريبًا</span>'}</td><td class="num">${UI.fmtDur(a.time_spent)}</td><td class="nowrap">${UI.fmtDate(a.submitted_at)}</td></tr>`).join('')
+  : '<tr><td colspan="8" class="muted" style="text-align:center;padding:18px">لم ترسل أي محاولة في هذا الفصل بعد.</td></tr>';
+document.querySelectorAll('#hist tr.click').forEach(r => r.onclick = () => location.href = 'exam.html?review=' + encodeURIComponent(r.dataset.id));
+})();
+</script>
+</body>
+</html>

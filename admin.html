@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الإدارة · منصة ابن حزم</title>
+<link rel="stylesheet" href="css/app.css">
+<style>
+.cov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.cov .c{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:12px 14px}
+.cov .c h3{margin:0 0 2px;font-size:1.02em;color:var(--g8);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cov .subs{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.cov .subs span{font-size:.78em;border-radius:7px;padding:.15em .55em;font-weight:700}
+.cov .y{background:var(--ok-bg);color:var(--ok)}.cov .n{background:#f1f3f2;color:#8a958f}
+.set{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.switch input{width:46px;height:26px;appearance:none;background:#cfdbe4;border-radius:99px;position:relative;cursor:pointer;transition:.2s}
+.switch input::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked{background:var(--g5)}.switch input:checked::after{right:23px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="page-head"><div><h1>لوحة تحكم الإدارة</h1><p>الصفوف 5–12، كل الشعب والامتحانات والنتائج في مكان واحد.</p></div><span class="pill gold" id="termPill"></span></div>
+  <nav class="nav"><button data-t="ov" class="on">🏫 الصفوف والامتحانات</button><button data-t="ex">📚 كل الامتحانات</button><button data-t="rs">📊 نتائج المدرسة</button><button data-t="ro">🧾 سجل الطلاب</button><button data-t="st">⚙️ الإعدادات</button></nav>
+
+  <section id="t-ov">
+    <div class="kpis" id="ovK"></div>
+    <div class="section-t"><div><h2>تغطية المواد لكل صف</h2><p>الأخضر = يوجد امتحان منشور في الفصل النشط. اضغط على الصف لرؤية شعبه.</p></div>
+      <div class="row"><label class="switch"><input type="checkbox" id="onlyMissing"> إظهار الصفوف الناقصة فقط</label><a class="btn sec" href="teacher.html">➕ رفع امتحان</a><button class="btn" id="fullRep">${''}⬇ التقرير الشامل (Excel)</button></div></div>
+    <div id="seedBox"></div>
+    <div class="cov" id="cov"></div>
+  </section>
+  <section id="t-ex" class="hidden"></section>
+  <section id="t-rs" class="hidden"></section>
+  <section id="t-ro" class="hidden">
+    <div class="section-t"><div><h2>سجل الطلاب</h2><p id="roSub"></p></div>
+      <div class="row"><button class="btn sec" id="roTpl">⬇ قالب السجل</button><button class="btn sec" id="roExp">⬇ تصدير السجل الحالي</button><label class="btn">⬆ رفع سجل جديد (.xlsx)<input type="file" id="roFile" accept=".xlsx,.xls,.csv" hidden></label></div></div>
+    <div class="notice info">يُخزَّن <b>رقم الطالب والصف والمسار والشعبة فقط</b> — بدون أسماء. أعمدة الملف: رقم الطالب · الصف · المسار (عام/متقدم) · الشعبة. رفع سجل جديد يستبدل القديم، وتبقى محاولات الطلاب السابقة محفوظة.</div>
+    <div id="roMsg"></div>
+    <div class="filters"><input class="in ltr" id="roQ" placeholder="بحث برقم الطالب…"><select class="in" id="roG"></select></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>رقم الطالب</th><th>الصف</th><th>المسار</th><th>الشعبة</th></tr></thead><tbody id="roT"></tbody></table></div>
+  </section>
+  <section id="t-st" class="hidden"><div class="set">
+    <div class="card"><h3>الفصل الدراسي النشط</h3><p class="muted small">يرى الطلاب امتحانات الفصل النشط فقط، وتبقى الفصول السابقة مؤرشفة للمراجعة.</p><select class="in" id="term"></select><button class="btn" id="termSave" style="margin-top:10px">حفظ</button></div>
+    <div class="card"><h3>طلاب المدارس الأخرى (الزوار)</h3><p class="muted small">يكتب الزائر اسمه ويختار صفه ومساره فيرى كل الامتحانات المنشورة لذلك الصف. نتائجهم لا تدخل في تقارير المدرسة.</p>
+      <label class="switch"><input type="checkbox" id="guest"> السماح بدخول الزوار</label><div class="kpis" style="grid-template-columns:1fr 1fr;margin:12px 0 0" id="vis"></div></div>
+    <div class="card"><h3>رمز المعلمين</h3><p class="muted small">رمز مشترك لكل المعلمين لدخول بوابة المعلم.</p><input class="in ltr" id="pinT" inputmode="numeric" maxlength="4" placeholder="رمز جديد من 4 أرقام"><button class="btn" id="pinTS" style="margin-top:10px">تغيير</button></div>
+    <div class="card"><h3>رمز الإدارة</h3><p class="muted small">يُستخدم لفتح لوحة التحكم هذه.</p><input class="in ltr" id="pinA" inputmode="numeric" maxlength="4" placeholder="رمز جديد من 4 أرقام"><button class="btn" id="pinAS" style="margin-top:10px">تغيير</button></div>
+    <div class="card" id="localCard"><h3>بيانات التجربة</h3><p class="muted small">المنصة تعمل الآن في <b>وضع التجربة</b>: البيانات محفوظة في هذا المتصفح فقط. لربطها بقاعدة بيانات مشتركة راجع دليل التشغيل.</p><button class="btn danger" id="reset">مسح كل البيانات والبدء من جديد</button></div>
+  </div></section>
+</main>
+<script src="js/config.js"></script><script src="js/catalog.js"></script><script src="js/seed-exams.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="vendor/xlsx.full.min.js"></script><script src="js/panels.js"></script>
+<script>
+(async function () {
+'use strict';
+UI.guard('admin'); UI.header({ home: 'admin.html' });
+const { $, $$, esc } = UI;
+$('#fullRep').textContent = '⬇ التقرير الشامل (Excel)';
+let st = await API.settings();
+$('#termPill').textContent = 'الفصل النشط: ' + Catalog.TERM_AR[st.term];
+let exams = [], roster = [], results = [];
+async function loadAll() { [exams, roster, results] = await Promise.all([API.exams(), API.roster(), API.results(st.term)]); }
+await loadAll();
+
+// ------------------------------------------------------------- tabs
+let exP = null, rsP = null;
+$$('.nav button').forEach(b => b.onclick = async () => {
+  $$('.nav button').forEach(x => x.classList.toggle('on', x === b)); ['ov', 'ex', 'rs', 'ro', 'st'].forEach(t => $('#t-' + t).classList.toggle('hidden', t !== b.dataset.t));
+  const t = b.dataset.t;
+  if (t === 'ov') { await loadAll(); overview(); }
+  if (t === 'ex') exP ? exP.reload() : (exP = await Panels.examsPanel($('#t-ex'), { term: st.term, onEdit: ex => { sessionStorage.setItem('ihz.editExam', ex.id); location.href = 'teacher.html'; } }));
+  if (t === 'rs') rsP ? rsP.reload() : (rsP = await Panels.resultsPanel($('#t-rs'), { term: st.term }));
+  if (t === 'ro') { roster = await API.roster(); drawRoster(); }
+  if (t === 'st') settings();
+});
+
+// ------------------------------------------------------------- overview
+const classes = () => APP_CONFIG.grades.flatMap(g => Catalog.tracksFor(g).map(t => ({ g, t })));
+const coreSubs = (g, t) => Catalog.subjectsFor(g, t).filter(s => !['Other', 'Computer Science'].includes(s) && !(t === 'General' && g <= 10 && ['Physics', 'Chemistry', 'Biology'].includes(s)));
+function coverage() {
+  return classes().map(({ g, t }) => {
+    const ex = exams.filter(e => e.grade == g && e.track === t && e.term === st.term && e.published);
+    const subs = coreSubs(g, t).map(s => ({ s, n: ex.filter(e => e.subject === s).length }));
+    const stu = roster.filter(r => r.grade == g && r.track === t), secs = [...new Set(stu.map(r => r.section))].sort();
+    const part = new Set(results.filter(a => a.grade == g && a.track === t).map(a => a.student_id)).size;
+    return { g, t, ex, subs, stu: stu.length, secs, part };
+  });
+}
+function overview() {
+  const cv = coverage(); const slots = cv.reduce((s, c) => s + c.subs.length, 0), up = cv.reduce((s, c) => s + c.subs.filter(x => x.n).length, 0);
+  const part = new Set(results.map(a => a.student_id)).size;
+  $('#ovK').innerHTML = `<div class="kpi"><small>امتحانات منشورة (الفصل النشط)</small><b>${exams.filter(e => e.term === st.term && e.published).length}</b></div><div class="kpi"><small>مواد مغطاة</small><b>${up} / ${slots}</b></div>
+    <div class="kpi"><small>طلاب شاركوا</small><b>${part} / ${roster.length}</b></div><div class="kpi"><small>محاولات الطلاب</small><b>${results.length}</b></div>`;
+  const only = $('#onlyMissing').checked;
+  $('#seedBox').innerHTML = !exams.length && (window.SEED_EXAMS || []).length ? `<div class="notice info">لا توجد امتحانات بعد. <button class="btn sm" id="seedBtn">إضافة امتحانَي التدريب الجاهزين (9 و10 متقدم – رياضيات)</button></div>` : '';
+  if ($('#seedBtn')) $('#seedBtn').onclick = async () => { for (const e of SEED_EXAMS) { const { id, ...x } = e; await API.saveExam(x); } UI.toast('تمت إضافة الامتحانين.'); await loadAll(); overview(); };
+  $('#cov').innerHTML = cv.filter(c => !only || c.subs.some(x => !x.n)).map(c => { const miss = c.subs.filter(x => !x.n).length;
+    return `<div class="c"><h3>${Catalog.classLabel(c.g, c.t)} ${miss ? `<span class="pill bad">${miss} مادة ناقصة</span>` : '<span class="pill ok">كل المواد مرفوعة</span>'}</h3>
+      <div class="small muted">${c.stu} طالب · ${c.secs.length} شعبة · شارك ${c.part}</div>
+      <div class="subs">${c.subs.map(x => `<span class="${x.n ? 'y' : 'n'}">${Catalog.subjAr(x.s)}${x.n ? ' ×' + x.n : ''}</span>`).join('')}</div>
+      ${c.secs.length ? `<details class="small" style="margin-top:8px"><summary style="cursor:pointer;color:var(--g8);font-weight:700">الشعب</summary>${c.secs.map(s => { const ids = new Set(roster.filter(r => r.grade == c.g && r.track === c.t && r.section === s).map(r => r.id)); const p = new Set(results.filter(a => ids.has(a.student_id)).map(a => a.student_id)).size; return `<div>${esc(s)}: ${ids.size} طالب · شارك ${p}</div>`; }).join('')}</details>` : ''}</div>`; }).join('') || '<div class="empty">كل الصفوف مغطاة 🎉</div>';
+}
+$('#onlyMissing').onchange = overview;
+$('#fullRep').onclick = () => {
+  const cv = coverage(); const T = Catalog.TERM_AR[st.term];
+  const best = new Map(); results.forEach(a => { const k = a.student_id + '|' + a.exam_id; const c = best.get(k); if (!c || a.pct > c.pct) best.set(k, { ...a, n: (c ? c.n : 0) + 1 }); else c.n++; });
+  UI.saveXlsx([
+    { name: 'ملخص الصفوف', widths: [18, 10, 10, 12, 14, 14, 50], rows: [['الصف', 'الطلاب', 'الشعب', 'شاركوا', 'نسبة المشاركة %', 'مواد مرفوعة', 'مواد ناقصة'], ...cv.map(c => [Catalog.classLabel(c.g, c.t), c.stu, c.secs.length, c.part, c.stu ? Math.round(c.part / c.stu * 100) : 0, `${c.subs.filter(x => x.n).length} / ${c.subs.length}`, c.subs.filter(x => !x.n).map(x => Catalog.subjAr(x.s)).join('، ')])] },
+    { name: 'حالة رفع المواد', widths: [18, 22, 10, 50, 26], rows: [['الصف', 'المادة', 'عدد الامتحانات', 'العناوين', 'المعلمون'], ...cv.flatMap(c => c.subs.map(x => { const ex = c.ex.filter(e => e.subject === x.s); return [Catalog.classLabel(c.g, c.t), Catalog.subjAr(x.s), ex.length, ex.map(e => e.title).join(' | '), [...new Set(ex.map(e => e.teacher))].join('، ')]; }))] },
+    { name: 'أفضل الدرجات', widths: [18, 14, 10, 18, 40, 10, 10, 10, 10], rows: [['رقم الطالب', 'الصف', 'الشعبة', 'المادة', 'الامتحان', 'المحاولات', 'أفضل درجة', 'من', 'النسبة %'], ...[...best.values()].sort((a, b) => String(a.section).localeCompare(String(b.section)) || String(a.student_id).localeCompare(String(b.student_id))).map(a => [a.student_id, Catalog.classLabel(a.grade, a.track), a.section, Catalog.subjAr(a.subject), a.exam_title, a.n, a.score, a.total, a.pct])] },
+    { name: 'كل المحاولات', widths: [18, 14, 10, 18, 40, 8, 8, 8, 10, 10, 18], rows: [['رقم الطالب', 'الصف', 'الشعبة', 'المادة', 'الامتحان', 'المحاولة', 'الدرجة', 'من', 'النسبة %', 'الوقت', 'التاريخ'], ...results.map(a => [a.student_id, Catalog.classLabel(a.grade, a.track), a.section, Catalog.subjAr(a.subject), a.exam_title, a.attempt_no, a.score, a.total, a.pct, UI.fmtDur(a.time_spent), UI.fmtDate(a.submitted_at)])] },
+  ], `IbnHazm_Full_Report_${st.term.replace(' ', '')}.xlsx`);
+};
+overview();
+
+// ------------------------------------------------------------- roster
+$('#roG').innerHTML = '<option value="">كل الصفوف</option>' + APP_CONFIG.grades.flatMap(g => Catalog.tracksFor(g).map(t => `<option value="${g}|${t}">${Catalog.classLabel(g, t)}</option>`)).join('');
+function drawRoster() {
+  const q = API.normId($('#roQ').value), g = $('#roG').value;
+  const f = roster.filter(r => (!q || API.normId(r.id).includes(q)) && (!g || `${r.grade}|${r.track}` === g));
+  $('#roSub').textContent = `${roster.length} طالب في ${new Set(roster.map(r => r.grade + r.track + r.section)).size} شعبة`;
+  $('#roT').innerHTML = f.slice(0, 400).map(r => `<tr><td class="ltr" style="text-align:right">${esc(r.id)}</td><td>${r.grade}</td><td>${Catalog.TRACK_AR[r.track]}</td><td>${esc(r.section)}</td></tr>`).join('') + (f.length > 400 ? `<tr><td colspan="4" class="muted">يُعرض أول 400 — استخدم البحث لرؤية المزيد.</td></tr>` : '') || '<tr><td colspan="4" class="muted" style="text-align:center">لا يوجد طلاب.</td></tr>';
+}
+$('#roQ').oninput = drawRoster; $('#roG').onchange = drawRoster;
+$('#roTpl').onclick = () => UI.saveXlsx([{ name: 'الطلاب', widths: [22, 8, 12, 12], rows: [['رقم الطالب', 'الصف', 'المسار', 'الشعبة'], ['784201012345678', 10, 'متقدم', '10-1'], ['784201112345679', 7, 'عام', '7-2']] }], 'IbnHazm_Roster_Template.xlsx');
+$('#roExp').onclick = () => UI.saveXlsx([{ name: 'الطلاب', widths: [22, 8, 12, 12], rows: [['رقم الطالب', 'الصف', 'المسار', 'الشعبة'], ...roster.map(r => [r.id, r.grade, Catalog.TRACK_AR[r.track], r.section])] }], 'IbnHazm_Roster.xlsx');
+$('#roFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return; const msg = $('#roMsg');
+  try {
+    const sheets = await UI.readXlsx(f); const rows = []; const bad = [];
+    for (const sh of sheets) {
+      const hi = sh.rows.findIndex(r => r.some(c => /رقم الطالب|student\s*id|الرقم/i.test(c))); if (hi < 0) continue;
+      const h = sh.rows[hi].map(String), col = re => h.findIndex(c => re.test(c));
+      const cI = col(/رقم الطالب|student\s*id|الرقم/i), cG = col(/الصف|grade/i), cT = col(/المسار|track|stream/i), cS = col(/الشعبة|section|class/i);
+      sh.rows.slice(hi + 1).forEach((r, k) => {
+        const id = API.normId(r[cI]); if (!id) return;
+        const gs = String(r[cG] ?? '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)); const g = +(gs.match(/\d{1,2}/) || [])[0];
+        const ts = String(cT >= 0 ? r[cT] : '') + ' ' + gs; const t = /متقدم|adv|^a$/i.test(ts.trim()) || /متقدم|adv/i.test(ts) ? 'Advanced' : 'General';
+        if (!(g >= 5 && g <= 12) || (t === 'Advanced' && g < 9)) { bad.push(`صف ${hi + k + 2}: الصف غير صحيح`); return; }
+        rows.push({ id, grade: g, track: t, section: String(cS >= 0 ? r[cS] : '').trim() || `${g}` });
+      });
+      if (rows.length) break;
+    }
+    if (!rows.length) { msg.innerHTML = '<div class="notice err">لم أجد عمود «رقم الطالب» في الملف. استخدم قالب السجل.</div>'; return; }
+    if (!(await UI.confirmBox(`استبدال سجل الطلاب بالملف «${esc(f.name)}» (${rows.length} طالب)؟ الطلاب غير الموجودين في الملف الجديد لن يستطيعوا الدخول، وتبقى محاولاتهم السابقة.`, 'استبدال السجل'))) return;
+    const r = await API.replaceRoster(rows); roster = await API.roster(); drawRoster();
+    msg.innerHTML = `<div class="notice ok">تم تحديث السجل: ${r.n} طالب (+${r.added} جديد / −${r.removed} محذوف).</div>` + (bad.length ? `<div class="notice warn">${bad.slice(0, 6).join('<br>')}${bad.length > 6 ? '<br>…' : ''}</div>` : '');
+  } catch (err) { msg.innerHTML = `<div class="notice err">${esc(err.message)}</div>`; }
+};
+
+// ------------------------------------------------------------- settings
+async function settings() {
+  st = await API.settings();
+  $('#term').innerHTML = Catalog.TERMS.map(t => `<option value="${t}"${t === st.term ? ' selected' : ''}>${Catalog.TERM_AR[t]}</option>`).join('');
+  $('#guest').checked = st.guest;
+  const v = await API.visitorStats();
+  $('#vis').innerHTML = `<div class="kpi"><small>زوار حتى الآن</small><b>${v.names}</b></div><div class="kpi"><small>امتحانات أدّاها الزوار</small><b>${v.practice}</b></div><div class="kpi"><small>دخول اليوم</small><b>${v.today}</b></div><div class="kpi"><small>آخر 7 أيام</small><b>${v.week}</b></div>`;
+  $('#localCard').classList.toggle('hidden', API.mode !== 'local');
+}
+$('#termSave').onclick = async () => { const t = $('#term').value; if (t === st.term) return; if (!(await UI.confirmBox(`تغيير الفصل النشط إلى ${Catalog.TERM_AR[t]}؟ سيرى الطلاب امتحانات هذا الفصل فقط.`))) return; await API.setTerm(t); UI.toast('تم تغيير الفصل النشط.'); setTimeout(() => location.reload(), 600); };
+$('#guest').onchange = async () => { await API.setGuest($('#guest').checked); UI.toast($('#guest').checked ? 'دخول الزوار مفعّل.' : 'دخول الزوار متوقف.'); };
+const pin = (inp, kind) => async () => { try { await API.changePin(kind, $(inp).value.trim()); $(inp).value = ''; UI.toast('تم تغيير الرمز.'); } catch (e) { UI.toast(e.message, 'err'); } };
+$('#pinTS').onclick = pin('#pinT', 'teacher'); $('#pinAS').onclick = pin('#pinA', 'admin');
+$('#reset').onclick = async () => { if (await UI.confirmBox('مسح كل الامتحانات والنتائج وسجل الطلاب من هذا المتصفح والعودة إلى بيانات التجربة؟ لا يمكن التراجع.', 'مسح الكل', 'danger')) { await API.resetAll(); API.logout(); location.href = 'index.html'; } };
+})();
+</script>
+</body>
+</html>

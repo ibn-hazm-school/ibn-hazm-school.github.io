@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الامتحان · منصة ابن حزم</title>
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{background:#F3F8FC}
+body.fs1{font-size:16.5px}body.fs2{font-size:18.5px}body.fs3{font-size:21px}
+body.spaced .qc,body.spaced .ans{line-height:2.1;letter-spacing:.02em}
+body.dark{--bg:#0e1c27;background:#0c1822;color:#e6eef4}
+body.dark .qpane,body.dark .side,body.dark .ans,body.dark .xbar,body.dark .start,body.dark .rv{background:#152a39;border-color:#24435a;color:#e6eef49}
+body.dark .qc .ar{color:#b6c8d6}body.dark .ans:hover{background:#1b3446}body.dark .qfig svg{background:#fff;border-radius:8px}
+body.yellow{background:#000;color:#ff0}body.yellow .qpane,body.yellow .side,body.yellow .ans,body.yellow .xbar,body.yellow .start,body.yellow .rv{background:#000;border-color:#ff0;color:#ff0}
+body.yellow .qc .ar{color:#ff0}body.yellow .qfig svg{background:#fff}
+.xtop{background:linear-gradient(90deg,#2F8FCB,#5BB8E8);color:#fff;position:sticky;top:0;z-index:40}
+.xtop .in-wrap{max-width:1300px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;gap:10px}
+.xtop .ttl{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.xtop .ttl small{display:block;font-weight:600;opacity:.8;font-size:.78em}
+.timer{background:#fff;color:var(--navy);border-radius:10px;padding:.3em .8em;font-weight:800;font-variant-numeric:tabular-nums;direction:ltr;min-width:92px;text-align:center}
+.timer.low{background:#FFE3DF;color:var(--bad);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.xtop .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
+.xtop .btn.gold{background:var(--gold);border-color:var(--gold)}
+.xbar{background:#fff;border-bottom:1px solid var(--line)}
+.xbar .in-wrap{max-width:1300px;margin:0 auto;padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tool{border:1px solid var(--line);background:#fff;border-radius:9px;padding:.3em .7em;cursor:pointer;font-weight:700;font-size:.88em;display:inline-flex;gap:.35em;align-items:center;color:inherit;background:transparent}
+.tool:hover{background:var(--g1)}.tool.on{background:var(--g8);color:#fff;border-color:var(--g8)}
+.tool:disabled{opacity:.4;cursor:not-allowed}
+.xmain{max-width:1300px;margin:0 auto;padding:16px 14px 90px;display:grid;grid-template-columns:230px 1fr;gap:16px}
+@media (max-width:860px){.xmain{grid-template-columns:1fr}.side{order:2;position:static}.qgrid{grid-template-columns:repeat(10,1fr);gap:4px}.qb{font-size:.8em}.xbar .tool{font-size:.78em;padding:.25em .5em}.qbody{padding:14px}}
+.side{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;align-self:start;position:sticky;top:110px}
+.side h4{margin:0 0 8px;color:var(--g8)}
+.qgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.qb{border:1.5px solid var(--line);background:#fff;border-radius:8px;aspect-ratio:1;padding:0;min-width:0;font-weight:800;cursor:pointer;position:relative;font-family:Montserrat;color:#55615c}
+.qb.seen{border-color:#A9C6DA}.qb.ans{background:var(--g8);border-color:var(--g8);color:#fff}
+.qb.cur{outline:3px solid var(--gold);outline-offset:1px}
+.qb.flag::after{content:"";position:absolute;top:-4px;inset-inline-end:-4px;width:11px;height:11px;border-radius:50%;background:#E67E22;border:2px solid #fff}
+.qb.r-ok{background:var(--ok);border-color:var(--ok);color:#fff}.qb.r-bad{background:var(--bad);border-color:var(--bad);color:#fff}.qb.r-skip{background:#fff;border-color:var(--bad);color:var(--bad)}
+.legend{display:grid;gap:4px;font-size:.78em;margin-top:10px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-inline-end:6px;vertical-align:-2px;border:1.5px solid var(--line)}
+.prog{height:6px;background:var(--line-2);border-radius:9px;overflow:hidden;margin:10px 0 4px}.prog i{display:block;height:100%;background:var(--g5);transition:.3s}
+.qpane{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.qhead{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--g0);border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+.qhead b{color:var(--g8);font-size:1.05em}
+.qbody{padding:18px 20px}
+.answers{display:grid;gap:10px;margin-top:18px}
+.ans{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;background:#fff;transition:.12s;position:relative;text-align:start;width:100%;color:inherit;font:inherit}
+.ans:hover{border-color:#9DD0EE;background:var(--g0)}
+.ans .L{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;flex:none;font-family:Montserrat}
+.ans.on{border-color:var(--g6);background:var(--g1)}.ans.on .L{background:var(--g8);border-color:var(--g8);color:#fff}
+.ans.struck .opt-c,.ans.struck img{text-decoration:line-through;opacity:.4}
+.ans .stk{margin-inline-start:auto;border:0;background:none;cursor:pointer;opacity:.45;font-size:1.05em;padding:4px 6px;border-radius:6px;color:inherit}
+.ans .stk:hover{opacity:1;background:var(--line-2)}
+.ans.ok{border-color:var(--ok);background:var(--ok-bg)}.ans.ok .L{background:var(--ok);border-color:var(--ok);color:#fff}
+.ans.bad{border-color:var(--bad);background:var(--bad-bg)}.ans.bad .L{background:var(--bad);border-color:var(--bad);color:#fff}
+.ans .tag{margin-inline-start:auto;font-size:.8em;font-weight:800}
+.qnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:30;box-shadow:0 -4px 14px rgba(0,0,0,.05)}
+.qnav .in-wrap{max-width:1300px;margin:0 auto;padding:10px 14px;display:flex;gap:10px;align-items:center}
+body.dark .qnav,body.yellow .qnav{background:inherit;border-color:#24435a}
+.start{max-width:720px;margin:30px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);overflow:hidden}
+.start .sh{background:linear-gradient(135deg,#E4F4FD,#BFE3F7);color:var(--navy);padding:22px 24px}
+.start .sh h1{margin:0;font-size:1.4em}
+.start .sb{padding:20px 24px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 16px}
+@media (max-width:600px){.facts{grid-template-columns:1fr 1fr}}
+.facts div{background:var(--g0);border:1px solid var(--line-2);border-radius:10px;padding:10px;text-align:center}
+.facts b{display:block;font-size:1.3em;color:var(--g8)}
+.facts small{color:var(--muted)}
+.rules{margin:0;padding-inline-start:1.2em;color:#3e4b45}.rules li{margin:.25em 0}
+.result{max-width:900px;margin:22px auto 0}
+.score-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:22px;display:grid;grid-template-columns:170px 1fr;gap:22px;align-items:center}
+@media (max-width:600px){.score-card{grid-template-columns:1fr;text-align:center}}
+.ring{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;margin:auto}
+.ring div{width:124px;height:124px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:2em;font-weight:800;color:var(--g8);font-family:Montserrat}
+.rv{background:#fff;border:1px solid var(--line);border-radius:14px;margin-top:14px;overflow:hidden}
+.rv .qhead .pill{margin-inline-start:auto}
+.sol{margin-top:12px;background:var(--gold-0);border:1px solid #ecdcb2;border-radius:10px;padding:10px 12px}
+/* calculator */
+.calc{position:fixed;top:120px;left:24px;width:300px;background:#1F3445;color:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.35);z-index:90;user-select:none;direction:ltr}
+.calc .ch{padding:8px 12px;cursor:move;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.9em}
+.calc .ch button{background:none;border:0;color:#fff;font-size:1.2em;cursor:pointer}
+.calc .scr{margin:0 10px;background:#E4F4FD;color:#0F4C75;border-radius:8px;padding:6px 10px;text-align:right;font-family:Montserrat;min-height:58px}
+.calc .scr .ex{font-size:.85em;opacity:.7;min-height:1.2em;word-break:break-all}
+.calc .scr .rs{font-size:1.45em;font-weight:800;word-break:break-all}
+.calc .ks{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:10px}
+.calc .ks button{border:0;border-radius:8px;padding:9px 0;font-weight:700;background:#34506A;color:#fff;cursor:pointer;font-family:Montserrat;font-size:.9em}
+.calc .ks button:hover{filter:brightness(1.2)}.calc .ks .op{background:#2F8FCB}.calc .ks .eq{background:var(--gold)}.calc .ks .cl{background:#9b3b31}
+.hl{background:#fff176;color:#000}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="js/config.js"></script><script src="js/catalog.js"></script><script src="js/seed-exams.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script>
+<script>
+(async function () {
+'use strict';
+const { $, $$, esc } = UI;
+const P = new URLSearchParams(location.search);
+const S = UI.guard();
+const isStaff = S.role === 'teacher' || S.role === 'admin';
+const preview = isStaff || P.get('preview') === '1';
+const back = isStaff ? (S.role === 'admin' ? 'admin.html' : 'teacher.html') : 'student.html';
+const app = $('#app');
+const L = API.LETTERS;
+const pref = JSON.parse(localStorage.getItem('ihz.a11y') || '{}');
+const applyPref = () => { document.body.className = [pref.fs ? 'fs' + pref.fs : '', pref.sp ? 'spaced' : '', pref.th || ''].join(' '); };
+applyPref();
+
+// --------------------------------------------------------- review an old attempt
+if (P.get('review')) {
+  try { const r = await API.attempt(P.get('review')); renderResult(r, false); } catch (e) { fail(e); }
+  return;
+}
+let exam;
+try { exam = await API.exam(P.get('id')); } catch (e) { fail(e); return; }
+document.title = exam.title + ' · منصة ابن حزم';
+const KEY = `ihz.prog.${S.role}.${S.id || S.name}.${exam.id}`;
+let st = null; try { st = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (_) {}
+const total = exam.questions.reduce((s, q) => s + (Number(q.marks) || 0), 0);
+
+function fail(e) { app.innerHTML = `<div class="start"><div class="sh"><h1>تعذر فتح الامتحان</h1></div><div class="sb"><p>${esc(e.message)}</p><a class="btn" href="${back}">رجوع</a></div></div>`; }
+
+// --------------------------------------------------------- start screen
+function startScreen() {
+  app.innerHTML = `<div class="xtop"><div class="in-wrap"><div class="ttl">${esc(exam.title)}<small>${Catalog.subjAr(exam.subject)} · ${Catalog.classLabel(exam.grade, exam.track)}</small></div><a class="btn sm" href="${back}">رجوع</a></div></div>
+  <div class="start"><div class="sh"><small>${preview ? 'معاينة المعلم — لن تُحفظ النتيجة' : 'تعليمات الامتحان'}</small><h1>${esc(exam.title)}</h1></div><div class="sb">
+    <div class="facts"><div><b>${exam.questions.length}</b><small>سؤال</small></div><div><b>${total}</b><small>درجة</small></div><div><b>${exam.duration ? exam.duration : '∞'}</b><small>${exam.duration ? 'دقيقة' : 'بلا وقت محدد'}</small></div>
+      <div><b>${exam.calculator ? '✔' : '✖'}</b><small>${exam.calculator ? 'الآلة الحاسبة مسموحة' : 'الآلة الحاسبة غير مسموحة'}</small></div><div><b>${exam.passPct || 50}%</b><small>درجة النجاح</small></div><div><b>${esc(exam.teacher || '—')}</b><small>إعداد</small></div></div>
+    <ul class="rules"><li>اقرأ كل سؤال جيدًا واختر إجابة واحدة.</li><li>استخدم <b>قائمة الأسئلة</b> للتنقل، و<b>🚩 علامة المراجعة</b> للأسئلة التي تريد الرجوع إليها.</li>
+      <li>اضغط <b>✂</b> بجانب أي خيار لشطبه (استبعاده) دون اختياره.</li><li>يجب أن تمرّ على كل الأسئلة قبل التسليم.${exam.duration ? ' عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.' : ''}</li>
+      <li>إعدادات العرض (حجم الخط، التباعد، الألوان) من زر ♿ في شريط الأدوات.</li></ul>
+    ${st && st.started ? '<div class="notice info">لديك محاولة لم تُسلّم بعد — يمكنك المتابعة من حيث توقفت.</div>' : ''}
+    <div class="row" style="margin-top:16px">${st && st.started ? '<button class="btn lg" id="resume">متابعة المحاولة</button><button class="btn lg sec" id="go">بدء محاولة جديدة</button>' : '<button class="btn lg" id="go">ابدأ الامتحان</button>'}</div>
+  </div></div>`;
+  $('#go').onclick = () => { st = { started: Date.now(), answers: {}, flags: {}, struck: {}, seen: {}, cur: 0, spent: 0 }; save(); player(); };
+  if ($('#resume')) $('#resume').onclick = () => player();
+}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (_) {} };
+
+// --------------------------------------------------------- player
+let tick = null, t0 = 0;
+function elapsed() { return st.spent + (Date.now() - t0) / 1000; }
+function player() {
+  t0 = Date.now();
+  app.innerHTML = `<div class="xtop"><div class="in-wrap"><div class="ttl">${esc(exam.title)}<small>${Catalog.subjAr(exam.subject)} · ${Catalog.classLabel(exam.grade, exam.track)}${preview ? ' · معاينة' : ''}</small></div>
+      <span class="timer" id="timer">--:--</span><button class="btn sm gold" id="submit">تسليم</button></div></div>
+    <div class="xbar"><div class="in-wrap">
+      <button class="tool" id="tFlag">🚩 علامة للمراجعة</button>
+      <button class="tool" id="tClear">↺ مسح الإجابة</button>
+      <button class="tool" id="tHl" title="ظلّل نصًا ثم اضغط">🖍 تظليل</button>
+      <button class="tool" id="tCalc" ${exam.calculator ? '' : 'disabled title="الآلة الحاسبة غير مسموحة في هذا الامتحان"'}>🧮 الآلة الحاسبة</button>
+      <button class="tool" id="tInfo">ℹ معلومات الامتحان</button>
+      <button class="tool" id="tA11y">♿ إعدادات العرض</button>
+      ${S.role === 'guest' || S.role === 'student' ? '' : '<button class="tool" id="tKey">🔑 إظهار الإجابة</button>'}
+    </div></div>
+    <div class="xmain"><aside class="side"><h4>قائمة الأسئلة</h4><div class="qgrid" id="qgrid"></div>
+      <div class="prog"><i id="prog"></i></div><div class="small muted" id="progT"></div>
+      <div class="legend"><span><i style="background:var(--g8);border-color:var(--g8)"></i>تمت الإجابة</span><span><i style="border-color:#A9C6DA"></i>شوهد دون إجابة</span><span><i style="background:#E67E22;border-color:#E67E22;border-radius:50%"></i>علامة مراجعة</span></div></aside>
+      <section class="qpane" id="qpane"></section></div>
+    <nav class="qnav"><div class="in-wrap"><button class="btn sec" id="prev">→ السابق</button><span class="sp" style="flex:1;text-align:center" id="pos"></span><button class="btn" id="next">التالي ←</button></div></nav>`;
+  $('#submit').onclick = () => submit(false);
+  $('#prev').onclick = () => go(st.cur - 1); $('#next').onclick = () => go(st.cur + 1);
+  $('#tFlag').onclick = () => { const q = exam.questions[st.cur]; st.flags[q.id] = !st.flags[q.id]; save(); draw(); };
+  $('#tClear').onclick = () => { delete st.answers[exam.questions[st.cur].id]; save(); draw(); };
+  $('#tHl').onclick = highlight;
+  $('#tCalc').onclick = calculator;
+  $('#tInfo').onclick = info;
+  $('#tA11y').onclick = a11y;
+  if ($('#tKey')) $('#tKey').onclick = () => { $('#tKey').classList.toggle('on'); draw(); };
+  document.onkeydown = e => { if (e.target.closest('input,textarea,.calc')) return; if (e.key === 'ArrowLeft') go(st.cur + 1); if (e.key === 'ArrowRight') go(st.cur - 1);
+    const i = 'abcde'.indexOf(e.key.toLowerCase()); if (i >= 0 && i < exam.questions[st.cur].options.length) pick(L[i]); };
+  clearInterval(tick); tick = setInterval(timer, 500); timer(); draw();
+  window.onbeforeunload = () => { st.spent = elapsed(); t0 = Date.now(); save(); };
+}
+function timer() {
+  const el = $('#timer'); if (!el) return;
+  const sp = elapsed();
+  if (exam.duration) { const left = exam.duration * 60 - sp; if (left <= 0) { el.textContent = '00:00'; submit(true); return; } el.textContent = UI.fmtDur(left); el.classList.toggle('low', left < 120); }
+  else el.textContent = UI.fmtDur(sp);
+  if (Math.round(sp) % 5 === 0) { st.spent = sp; t0 = Date.now(); save(); }
+}
+function go(i) { if (i < 0 || i >= exam.questions.length) return; st.cur = i; save(); draw(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function pick(letter) { const q = exam.questions[st.cur]; st.answers[q.id] = letter; if (st.struck[q.id]) delete st.struck[q.id][letter]; save(); draw(); }
+function draw() {
+  const qs = exam.questions, q = qs[st.cur]; st.seen[q.id] = 1; save();
+  const showKey = $('#tKey') && $('#tKey').classList.contains('on');
+  $('#qgrid').innerHTML = qs.map((x, i) => `<button class="qb${st.seen[x.id] ? ' seen' : ''}${st.answers[x.id] ? ' ans' : ''}${st.flags[x.id] ? ' flag' : ''}${i === st.cur ? ' cur' : ''}" data-i="${i}">${i + 1}</button>`).join('');
+  $$('#qgrid .qb').forEach(b => b.onclick = () => go(+b.dataset.i));
+  const n = Object.keys(st.answers).length; $('#prog').style.width = (n / qs.length * 100) + '%'; $('#progT').textContent = `أجبت عن ${n} من ${qs.length}`;
+  const sk = st.struck[q.id] || {};
+  $('#qpane').innerHTML = `<div class="qhead"><b>السؤال ${st.cur + 1} من ${qs.length}</b><span class="pill">${q.marks} ${q.marks == 1 ? 'درجة' : 'درجات'}</span>${st.flags[q.id] ? '<span class="pill gold">🚩 للمراجعة</span>' : ''}${q.hint ? '<button class="tool" id="hintB" style="margin-inline-start:auto">💡 تلميح</button>' : ''}</div>
+    <div class="qbody"><div class="qc">${UI.stemHtml(q)}</div>${UI.figHtml(q)}
+      <div class="answers" dir="${UI.qDir(q)}">${q.options.map((o, i) => `<div class="ans${st.answers[q.id] === L[i] ? ' on' : ''}${sk[L[i]] ? ' struck' : ''}${showKey && q.correct === L[i] ? ' ok' : ''}" data-l="${L[i]}" role="button" tabindex="0"><span class="L">${L[i]}</span><span>${UI.optHtml(q, i)}</span><button class="stk" title="شطب الخيار" data-s="${L[i]}">✂</button></div>`).join('')}</div>
+      <div id="hintBox"></div></div>`;
+  $$('#qpane .ans').forEach(a => a.onclick = e => { if (e.target.closest('.stk')) return; pick(a.dataset.l); });
+  $$('#qpane .stk').forEach(b => b.onclick = () => { const s = st.struck[q.id] = st.struck[q.id] || {}; s[b.dataset.s] = !s[b.dataset.s]; if (s[b.dataset.s] && st.answers[q.id] === b.dataset.s) delete st.answers[q.id]; save(); draw(); });
+  if ($('#hintB')) $('#hintB').onclick = () => $('#hintBox').innerHTML = `<div class="sol">💡 ${UI.fmt(q.hint)}</div>`;
+  $('#tFlag').classList.toggle('on', !!st.flags[q.id]);
+  $('#prev').disabled = st.cur === 0; $('#next').disabled = st.cur === qs.length - 1;
+  $('#pos').textContent = `${st.cur + 1} / ${qs.length}`;
+}
+async function submit(auto) {
+  const qs = exam.questions;
+  if (!auto) {
+    const unseen = qs.findIndex(q => !st.seen[q.id]);
+    if (unseen >= 0) { UI.modal({ title: 'تنبيه', body: `<p>لا يمكنك التسليم قبل أن تمرّ على كل الأسئلة. أول سؤال لم تشاهده: <b>السؤال ${unseen + 1}</b>.</p>`, foot: [{ text: 'اذهب إليه', onClick: c => { c(); go(unseen); } }] }); return; }
+    const un = qs.filter(q => !st.answers[q.id]).length, fl = qs.filter(q => st.flags[q.id]).length;
+    const msg = (un ? `<p>⚠️ لديك <b>${un}</b> سؤال بدون إجابة.</p>` : '') + (fl ? `<p>🚩 لديك <b>${fl}</b> سؤال عليه علامة مراجعة.</p>` : '') + '<p>بعد التسليم لا يمكنك تغيير إجاباتك. هل تريد التسليم الآن؟</p>';
+    if (!(await UI.confirmBox(msg, 'تسليم الامتحان', 'gold'))) return;
+  }
+  clearInterval(tick); window.onbeforeunload = null; document.onkeydown = null; $$('.calc').forEach(c => c.remove());
+  const spent = Math.min(elapsed(), exam.duration ? exam.duration * 60 : Infinity);
+  let r;
+  if (preview) {
+    const g = API.gradeAttempt(exam, st.answers);
+    r = { ...g, exam, answers: st.answers, time_spent: spent, attempt_no: 0, preview: true };
+  } else {
+    try { r = await API.submit(exam.id, st.answers, spent); }
+    catch (e) { UI.toast(e.message, 'err'); tick = setInterval(timer, 500); return; }
+  }
+  localStorage.removeItem(KEY);
+  if (auto) UI.toast('انتهى الوقت! تم تسليم الامتحان تلقائيًا.');
+  renderResult(r, true);
+}
+
+// --------------------------------------------------------- results & review
+function renderResult(r, fresh) {
+  const ex = r.exam, rv = {}; (r.review || []).forEach(x => rv[x.qid] = x);
+  const col = r.passed ? 'var(--ok)' : 'var(--bad)';
+  const okN = (r.review || []).filter(x => x.picked === x.correct).length, skipN = (r.review || []).filter(x => !x.picked).length;
+  document.title = 'النتيجة · ' + ex.title;
+  app.innerHTML = `<div class="xtop"><div class="in-wrap"><div class="ttl">${esc(ex.title)}<small>${Catalog.subjAr(ex.subject)} · ${Catalog.classLabel(ex.grade, ex.track)}</small></div><a class="btn sm" href="${back}">لوحتي</a>${!P.get('review') || !isStaff ? `<a class="btn sm gold" href="exam.html?id=${encodeURIComponent(ex.id)}${preview && isStaff ? '&preview=1' : ''}">تدرّب مرة أخرى</a>` : ''}</div></div>
+  <div class="wrap"><div class="result">
+    ${r.preview ? '<div class="notice warn">معاينة المعلم — هذه النتيجة لم تُحفظ.</div>' : fresh ? '<div class="notice ok">تم تسليم الامتحان بنجاح وحُفظت نتيجتك.</div>' : ''}
+    <div class="score-card"><div class="ring" style="background:conic-gradient(${col} ${r.pct * 3.6}deg,var(--line-2) 0)"><div>${r.pct}%</div></div>
+      <div><h2 style="margin:0;color:${col}">${r.passed ? 'أحسنت! ناجح ✔' : 'تحتاج إلى مزيد من التدريب'}</h2>
+        <div class="facts" style="margin-top:12px"><div><b>${r.score} / ${r.total}</b><small>الدرجة</small></div><div><b>${okN}</b><small>إجابة صحيحة</small></div><div><b>${(r.review || []).length - okN - skipN}</b><small>إجابة خاطئة</small></div>
+          <div><b>${skipN}</b><small>بدون إجابة</small></div><div><b>${UI.fmtDur(r.time_spent)}</b><small>الوقت المستغرق</small></div><div><b>${r.attempt_no || '—'}</b><small>رقم المحاولة</small></div></div></div></div>
+    <div class="section-t"><div><h2>مراجعة الإجابات</h2><p>الأخضر الإجابة الصحيحة، والأحمر إجابتك الخاطئة.</p></div><div class="qgrid" style="grid-template-columns:repeat(10,32px)">${ex.questions.map((q, i) => { const x = rv[q.id] || {}; return `<a class="qb ${!x.picked ? 'r-skip' : x.picked === x.correct ? 'r-ok' : 'r-bad'}" href="#rv${i}" style="display:grid;place-items:center;text-decoration:none">${i + 1}</a>`; }).join('')}</div></div>
+    ${ex.questions.map((q, i) => { const x = rv[q.id] || {}; const st2 = !x.picked ? ['grey', 'بدون إجابة'] : x.picked === x.correct ? ['ok', `صحيح +${x.gained}`] : ['bad', 'خطأ 0'];
+      return `<div class="rv" id="rv${i}"><div class="qhead"><b>السؤال ${i + 1}</b><span class="pill">${q.marks} درجات</span><span class="pill ${st2[0]}">${st2[1]}</span></div><div class="qbody"><div class="qc">${UI.stemHtml(q)}</div>${UI.figHtml(q)}
+        <div class="answers" dir="${UI.qDir(q)}">${q.options.map((o, j) => { const l = L[j]; const c = l === x.correct ? ' ok' : l === x.picked ? ' bad' : ''; return `<div class="ans${c}" style="cursor:default"><span class="L">${l}</span><span>${UI.optHtml(q, j)}</span>${l === x.correct ? '<span class="tag" style="color:var(--ok)">الإجابة الصحيحة</span>' : l === x.picked ? '<span class="tag" style="color:var(--bad)">إجابتك</span>' : ''}</div>`; }).join('')}</div>
+        ${q.solution ? `<div class="sol"><b>الحل:</b> ${UI.fmt(q.solution)}</div>` : ''}</div></div>`; }).join('')}
+  </div></div>`;
+  window.scrollTo(0, 0);
+}
+
+// --------------------------------------------------------- tools
+function info() {
+  UI.modal({ title: 'معلومات الامتحان', body: `<table class="tbl"><tbody>
+    <tr><td>المتدرّب</td><td><b>${esc(S.role === 'student' ? 'رقم ' + S.id : S.name)}</b></td></tr><tr><td>المادة</td><td>${Catalog.subjAr(exam.subject)}</td></tr>
+    <tr><td>الصف</td><td>${Catalog.classLabel(exam.grade, exam.track)}</td></tr><tr><td>إعداد</td><td>${esc(exam.teacher || '—')}</td></tr>
+    <tr><td>المدة</td><td>${exam.duration ? exam.duration + ' دقيقة' : 'بلا وقت محدد'}</td></tr><tr><td>عدد الأسئلة</td><td>${exam.questions.length}</td></tr>
+    <tr><td>الدرجة الكلية</td><td>${total}</td></tr><tr><td>درجة النجاح</td><td>${exam.passPct || 50}%</td></tr><tr><td>الآلة الحاسبة</td><td>${exam.calculator ? 'مسموحة' : 'غير مسموحة'}</td></tr></tbody></table>`, foot: [{ text: 'إغلاق' }] });
+}
+function a11y() {
+  const m = UI.modal({ title: 'إعدادات العرض', body: `<label class="f">حجم الخط</label><div class="chips" id="fsC">${['عادي', 'كبير', 'أكبر', 'كبير جدًا'].map((t, i) => `<span class="chip${(pref.fs || 0) === i ? ' on' : ''}" data-v="${i}">${t}</span>`).join('')}</div>
+    <label class="f">تباعد الأسطر</label><div class="chips" id="spC"><span class="chip${!pref.sp ? ' on' : ''}" data-v="0">عادي</span><span class="chip${pref.sp ? ' on' : ''}" data-v="1">متباعد</span></div>
+    <label class="f">الألوان</label><div class="chips" id="thC">${[['', 'فاتح'], ['dark', 'داكن'], ['yellow', 'تباين عالٍ']].map(([v, t]) => `<span class="chip${(pref.th || '') === v ? ' on' : ''}" data-v="${v}">${t}</span>`).join('')}</div>`, foot: [{ text: 'إعادة الضبط', cls: 'sec', onClick: c => { pref.fs = 0; pref.sp = 0; pref.th = ''; done(); c(); } }, { text: 'تم' }] });
+  const done = () => { localStorage.setItem('ihz.a11y', JSON.stringify(pref)); applyPref(); };
+  const bind = (id, k, num) => $$(`#${id} .chip`, m.el).forEach(c => c.onclick = () => { pref[k] = num ? +c.dataset.v : c.dataset.v; $$(`#${id} .chip`, m.el).forEach(x => x.classList.toggle('on', x === c)); done(); });
+  bind('fsC', 'fs', 1); bind('spC', 'sp', 1); bind('thC', 'th', 0);
+}
+function highlight() {
+  const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) { UI.toast('ظلّل جزءًا من نص السؤال بالفأرة أولًا، ثم اضغط «تظليل».'); return; }
+  const r = sel.getRangeAt(0); if (!$('#qpane').contains(r.commonAncestorContainer)) return;
+  try { const m = document.createElement('mark'); m.className = 'hl'; r.surroundContents(m); } catch (_) { UI.toast('ظلّل جزءًا داخل سطر واحد.'); }
+  sel.removeAllRanges();
+}
+function calculator() {
+  if ($('.calc')) { $('.calc').remove(); $('#tCalc').classList.remove('on'); return; }
+  $('#tCalc').classList.add('on');
+  let expr = '', deg = true, ans = 0;
+  const c = document.createElement('div'); c.className = 'calc';
+  const keys = [['sin', 'f'], ['cos', 'f'], ['tan', 'f'], ['DEG', 'm'], ['C', 'cl'], ['sin⁻¹', 'f'], ['cos⁻¹', 'f'], ['tan⁻¹', 'f'], ['√', 'f'], ['⌫', 'cl'], ['x²', 'p'], ['^', 'o'], ['(', 'o'], [')', 'o'], ['÷', 'op'], ['log', 'f'], ['7'], ['8'], ['9'], ['×', 'op'], ['ln', 'f'], ['4'], ['5'], ['6'], ['−', 'op'], ['π', 'n'], ['1'], ['2'], ['3'], ['+', 'op'], ['Ans', 'n'], ['0'], ['.'], ['±', 'n'], ['=', 'eq']];
+  c.innerHTML = `<div class="ch"><span>🧮 الآلة الحاسبة العلمية</span><button aria-label="إغلاق">×</button></div><div class="scr"><div class="ex"></div><div class="rs">0</div></div><div class="ks">${keys.map(([k, t]) => `<button class="${t === 'op' ? 'op' : t === 'eq' ? 'eq' : t === 'cl' ? 'cl' : ''}" data-k="${k}">${k}</button>`).join('')}</div>`;
+  document.body.append(c);
+  const ex = $('.ex', c), rs = $('.rs', c);
+  const show = () => { ex.textContent = expr; };
+  const evalE = () => {
+    let s = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/π/g, '(PI)').replace(/Ans/g, '(' + ans + ')').replace(/\^/g, '**').replace(/²/g, '**2')
+      .replace(/sin⁻¹\(/g, 'ASIN(').replace(/cos⁻¹\(/g, 'ACOS(').replace(/tan⁻¹\(/g, 'ATAN(').replace(/sin\(/g, 'SIN(').replace(/cos\(/g, 'COS(').replace(/tan\(/g, 'TAN(').replace(/√\(/g, 'SQRT(').replace(/log\(/g, 'LOG(').replace(/ln\(/g, 'LN(');
+    if (/[^0-9+\-*/().eA-Z ]/.test(s.replace(/\*\*/g, '*'))) throw 0;
+    const open = (s.match(/\(/g) || []).length - (s.match(/\)/g) || []).length; s += ')'.repeat(Math.max(0, open));
+    const k = deg ? Math.PI / 180 : 1;
+    const f = new Function('PI', 'SIN', 'COS', 'TAN', 'ASIN', 'ACOS', 'ATAN', 'SQRT', 'LOG', 'LN', '"use strict";return (' + s + ')');
+    const v = f(Math.PI, x => Math.sin(x * k), x => Math.cos(x * k), x => Math.tan(x * k), x => Math.asin(x) / k, x => Math.acos(x) / k, x => Math.atan(x) / k, Math.sqrt, Math.log10, Math.log);
+    if (typeof v !== 'number' || !isFinite(v)) throw 0; return Math.abs(v) < 1e-12 ? 0 : +v.toPrecision(12);
+  };
+  $$('.ks button', c).forEach(b => b.onclick = () => {
+    const k = b.dataset.k;
+    if (k === 'C') { expr = ''; rs.textContent = '0'; }
+    else if (k === '⌫') expr = expr.replace(/(sin⁻¹\(|cos⁻¹\(|tan⁻¹\(|sin\(|cos\(|tan\(|log\(|ln\(|√\(|Ans|.)$/, '');
+    else if (k === 'DEG') { deg = !deg; b.textContent = deg ? 'DEG' : 'RAD'; }
+    else if (k === '=') { try { ans = evalE(); rs.textContent = ans; expr = ''; } catch (_) { rs.textContent = 'خطأ'; } }
+    else if (k === 'x²') expr += '²';
+    else if (k === '±') expr += '(−';
+    else if (['sin', 'cos', 'tan', 'sin⁻¹', 'cos⁻¹', 'tan⁻¹', 'log', 'ln', '√'].includes(k)) expr += k + '(';
+    else expr += k;
+    show();
+  });
+  $('.ch button', c).onclick = () => { c.remove(); $('#tCalc').classList.remove('on'); };
+  let dx, dy; $('.ch', c).onpointerdown = e => { dx = e.clientX - c.offsetLeft; dy = e.clientY - c.offsetTop; const mv = ev => { c.style.left = (ev.clientX - dx) + 'px'; c.style.top = (ev.clientY - dy) + 'px'; }; document.addEventListener('pointermove', mv); document.addEventListener('pointerup', () => document.removeEventListener('pointermove', mv), { once: true }); };
+}
+startScreen();
+})();
+</script>
+</body>
+</html>

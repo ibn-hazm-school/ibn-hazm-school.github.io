@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بوابة المعلم · منصة ابن حزم</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main class="wrap">
+  <div class="page-head"><div><h1>بوابة المعلم</h1><p>ارفع امتحانات التدريب، وأدرها، وتابع نتائج كل طالب.</p></div><span class="pill gold" id="termPill"></span></div>
+  <nav class="nav"><button data-t="up" class="on">➕ رفع امتحان</button><button data-t="mg">📚 إدارة الامتحانات</button><button data-t="rs">📊 نتائج الطلاب</button></nav>
+
+  <section id="t-up">
+    <div class="notice info hidden" id="editNote"></div>
+    <div class="step"><div class="sh"><span class="n">1</span><div><h3>اختر الصف والمادة</h3><p>هذه الاختيارات تحدد بدقة من يرى الامتحان من الطلاب.</p></div></div><div class="sb">
+      <div class="grid4">
+        <div><label class="f">الصف</label><select class="in" id="eg"></select></div>
+        <div><label class="f">المسار</label><select class="in" id="et"></select></div>
+        <div><label class="f">المادة</label><select class="in" id="es"></select></div>
+        <div><label class="f">الفصل الدراسي</label><select class="in" id="eterm"></select></div>
+      </div>
+      <label class="f">الشعب</label><div class="chips" id="esec"></div><div class="hint">«كل الشعب» = كل طلاب هذا الصف والمسار. الزوار من مدارس أخرى يرون كل امتحانات الصف المنشورة.</div>
+      <label class="f" for="etitle">عنوان الامتحان</label><input class="in" id="etitle" placeholder="مثال: نموذج تدريبي 1 — الوحدة الثالثة: التشابه">
+      <div class="grid3">
+        <div><label class="f">المدة (دقيقة)</label><input class="in ltr" id="edur" type="number" min="0" max="300" value="60"><div class="hint">0 = بلا وقت محدد</div></div>
+        <div><label class="f">الآلة الحاسبة</label><select class="in" id="ecalc"><option value="1">مسموحة</option><option value="0">غير مسموحة</option></select></div>
+        <div><label class="f">درجة النجاح %</label><input class="in ltr" id="epass" type="number" min="1" max="100" value="50"></div>
+      </div>
+    </div></div>
+
+    <div class="step"><div class="sh"><span class="n">2</span><div><h3>أضف الأسئلة</h3><p>ارفع ملف Excel جاهزًا، أو اكتب الأسئلة هنا مباشرة. يمكنك لصق صورة لأي سؤال (Ctrl+V).</p></div></div><div class="sb">
+      <div class="grid2">
+        <div class="drop" id="drop"><b>📥 اسحب ملف Excel هنا أو اضغط للاختيار</b><span class="muted small">يجب أن يكون على قالب المنصة</span><input type="file" id="file" accept=".xlsx,.xls,.csv" hidden></div>
+        <div class="bp"><b>طريقتان سريعتان لتجهيز الملف:</b>
+          <div class="row" style="margin-top:8px"><button class="btn sm gold" id="tpl">⬇ تنزيل قالب Excel</button><button class="btn sm sec" id="prompt">🤖 نسخ أمر Claude</button></div>
+          <div class="hint">املأ القالب يدويًا، أو أرسل القالب مع ورقة الامتحان (PDF أو صور) إلى Claude مع الأمر المنسوخ ليعيده لك مملوءًا.</div></div>
+      </div>
+      <div id="parseMsg"></div>
+      <div class="section-t"><div><h2 id="qCount">الأسئلة (0)</h2><p id="qSum"></p></div><div class="row"><button class="btn sec sm" id="addQ">➕ إضافة سؤال</button><button class="btn ghost sm" id="clearQ">🗑 حذف كل الأسئلة</button></div></div>
+      <div id="qlist"></div>
+      <div class="hint">طريقة كتابة الرموز: <span class="ltr">x^2</span> أُس · <span class="ltr">a_1</span> دليل · <span class="ltr">sqrt(5)</span> جذر · <span class="ltr">[3/4]</span> كسر · <span class="ltr">pi</span> π · <span class="ltr">&lt;= &gt;= !=</span> ≤ ≥ ≠ · <span class="ltr">30deg</span> درجة</div>
+    </div></div>
+
+    <div class="step"><div class="sh"><span class="n">3</span><div><h3>النشر</h3><p>احفظ الامتحان ليبدأ الطلاب التدريب عليه.</p></div></div><div class="sb">
+      <div id="sum" class="notice info"></div>
+      <div class="row"><button class="btn lg" id="pub">✔ نشر الآن (يراه الطلاب)</button><button class="btn lg sec" id="hide">حفظ كمخفي</button><button class="btn lg ghost" id="newE">امتحان جديد فارغ</button></div>
+    </div></div>
+  </section>
+  <section id="t-mg" class="hidden"></section>
+  <section id="t-rs" class="hidden"></section>
+</main>
+<script src="js/config.js"></script><script src="js/catalog.js"></script><script src="js/seed-exams.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="vendor/xlsx.full.min.js"></script><script src="js/panels.js"></script>
+<script>
+(async function () {
+'use strict';
+const S = UI.guard('teacher', 'admin'); UI.header({ home: S.role === 'admin' ? 'admin.html' : 'teacher.html' });
+const { $, $$, esc } = UI, L = API.LETTERS;
+const st = await API.settings();
+$('#termPill').textContent = 'الفصل النشط: ' + Catalog.TERM_AR[st.term];
+let roster = []; try { roster = await API.roster(); } catch (_) {}
+const prefs = JSON.parse(localStorage.getItem('ihz.tprefs') || '{}');
+
+// ------------------------------------------------------------- tabs
+let mg = null, rs = null;
+$$('.nav button').forEach(b => b.onclick = async () => {
+  $$('.nav button').forEach(x => x.classList.toggle('on', x === b)); ['up', 'mg', 'rs'].forEach(t => $('#t-' + t).classList.toggle('hidden', t !== b.dataset.t));
+  if (b.dataset.t === 'mg') mg ? mg.reload() : (mg = await Panels.examsPanel($('#t-mg'), { me: S.role === 'teacher' ? S.name : null, onEdit: edit, term: st.term }));
+  if (b.dataset.t === 'rs') rs ? rs.reload() : (rs = await Panels.resultsPanel($('#t-rs'), { term: st.term }));
+});
+
+// ------------------------------------------------------------- step 1
+let E;
+function blank() { return { id: null, title: '', subject: prefs.subject || 'Mathematics', grade: prefs.grade || 10, track: prefs.track || 'Advanced', sections: [], term: st.term, duration: 60, calculator: true, passPct: 50, published: true, teacher: S.name, questions: [] }; }
+$('#eg').innerHTML = APP_CONFIG.grades.map(g => `<option value="${g}">الصف ${g}</option>`).join('');
+$('#eterm').innerHTML = Catalog.TERMS.map(t => `<option value="${t}">${Catalog.TERM_AR[t]}</option>`).join('');
+function fillTracks() { const g = +$('#eg').value; $('#et').innerHTML = Catalog.tracksFor(g).map(t => `<option value="${t}">${Catalog.TRACK_AR[t]}</option>`).join(''); if (!Catalog.tracksFor(g).includes(E.track)) E.track = 'General'; $('#et').value = E.track; }
+function fillSubjects() { const ss = Catalog.subjectsFor(E.grade, E.track); $('#es').innerHTML = ss.map(s => `<option value="${s}">${Catalog.subjAr(s)}</option>`).join(''); if (!ss.includes(E.subject)) E.subject = ss[0]; $('#es').value = E.subject; }
+function fillSections() {
+  const secs = [...new Set(roster.filter(r => +r.grade === +E.grade && r.track === E.track).map(r => r.section).filter(Boolean))].sort();
+  E.sections = E.sections.filter(s => secs.includes(s));
+  $('#esec').innerHTML = `<span class="chip${!E.sections.length ? ' on' : ''}" data-s="">كل الشعب</span>` + secs.map(s => `<span class="chip${E.sections.includes(s) ? ' on' : ''}" data-s="${esc(s)}">${esc(s)}</span>`).join('') + (secs.length ? '' : '<span class="muted small" style="align-self:center">لا توجد شعب في سجل الطلاب لهذا الصف بعد.</span>');
+  $$('#esec .chip').forEach(c => c.onclick = () => { const s = c.dataset.s; if (!s) E.sections = []; else E.sections = E.sections.includes(s) ? E.sections.filter(x => x !== s) : [...E.sections, s]; fillSections(); });
+}
+function loadForm() {
+  $('#eg').value = E.grade; fillTracks(); fillSubjects(); fillSections();
+  $('#eterm').value = E.term; $('#etitle').value = E.title; $('#edur').value = E.duration; $('#ecalc').value = E.calculator ? '1' : '0'; $('#epass').value = E.passPct;
+  $('#editNote').classList.toggle('hidden', !E.id); if (E.id) $('#editNote').innerHTML = `✏️ تعديل امتحان موجود: <b>${esc(E.title)}</b> — الحفظ يحدّث النسخة المنشورة. <a href="#" id="cancelEdit">إلغاء التعديل</a>`;
+  if ($('#cancelEdit')) $('#cancelEdit').onclick = e => { e.preventDefault(); E = blank(); loadForm(); };
+  drawQs();
+}
+$('#eg').onchange = () => { E.grade = +$('#eg').value; fillTracks(); fillSubjects(); fillSections(); summary(); };
+$('#et').onchange = () => { E.track = $('#et').value; fillSubjects(); fillSections(); summary(); };
+$('#es').onchange = () => { E.subject = $('#es').value; summary(); };
+$('#eterm').onchange = () => E.term = $('#eterm').value;
+$('#etitle').oninput = () => { E.title = $('#etitle').value; summary(); };
+$('#edur').oninput = () => E.duration = Math.max(0, +$('#edur').value || 0);
+$('#ecalc').onchange = () => E.calculator = $('#ecalc').value === '1';
+$('#epass').oninput = () => E.passPct = Math.min(100, Math.max(1, +$('#epass').value || 50));
+
+// ------------------------------------------------------------- step 2: questions
+const newQ = () => ({ id: 'q' + Math.random().toString(36).slice(2, 9), stem: '', stemSrc: '', fig: '', image: '', options: ['', '', '', ''], optSrc: ['', '', '', ''], correct: '', marks: prefs.marks || 3, hint: '', solution: '' });
+function problems(q) {
+  const p = []; if (!(q.stemSrc != null ? q.stemSrc.trim() : q.stem) && !q.image && !q.fig) p.push('نص السؤال فارغ');
+  const opts = q.optSrc ? q.optSrc : q.options; const filled = opts.filter((o, i) => String(o).trim() || (q.optImages && q.optImages[i])).length;
+  if (filled < 2) p.push('أقل من خيارين'); if (!q.correct) p.push('لم تُحدَّد الإجابة الصحيحة');
+  else if (!String(opts[L.indexOf(q.correct)] || '').trim() && !(q.optImages && q.optImages[L.indexOf(q.correct)])) p.push('الإجابة الصحيحة خيار فارغ');
+  if (!(+q.marks > 0)) p.push('الدرجة غير صحيحة'); return p;
+}
+let pasteTarget = null;
+function drawQs() {
+  const box = $('#qlist');
+  box.innerHTML = E.questions.map((q, i) => { const pr = problems(q); const html = q.stemSrc == null;
+    return `<div class="qe${pr.length ? ' bad' : ''}" data-i="${i}"><div class="qeh"><b>السؤال ${i + 1}</b>${pr.length ? `<span class="pill bad">${pr.join(' · ')}</span>` : '<span class="pill ok">جاهز</span>'}<span style="flex:1"></span>
+      <label class="small">الدرجة <input class="in ltr" data-k="marks" type="number" min="0.5" step="0.5" value="${q.marks}" style="width:70px;padding:.25em .4em;display:inline-block"></label>
+      <button class="btn sm ghost" data-a="up" title="تحريك لأعلى">▲</button><button class="btn sm ghost" data-a="down" title="تحريك لأسفل">▼</button><button class="btn sm ghost" data-a="dup" title="نسخ">⧉</button><button class="btn sm danger" data-a="del">حذف</button></div>
+      <div class="qeb">${html ? `<div class="qc" style="background:var(--g0);border-radius:8px;padding:10px">${UI.stemHtml(q)}</div><button class="btn sm sec" data-a="totext" style="margin-top:6px">تحويل إلى نص قابل للتعديل</button>`
+        : `<textarea class="in" dir="auto" data-k="stem" placeholder="اكتب نص السؤال… (عربي أو إنجليزي)">${esc(q.stemSrc)}</textarea>`}
+        ${q.fig ? `<div class="qfig">${q.fig}</div>` : ''}
+        <div class="row" style="margin-top:6px"><label class="btn sm sec">📷 صورة للسؤال<input type="file" accept="image/*" data-a="img" hidden></label><button class="btn sm sec" data-a="paste">📋 لصق صورة (Ctrl+V)</button>${q.image ? '<button class="btn sm danger" data-a="rmimg">حذف الصورة</button>' : ''}</div>
+        ${q.image ? `<img class="img-prev" src="${q.image}" alt="">` : ''}
+        <div class="opts">${q.options.map((o, j) => `<div class="opt"><span class="L${q.correct === L[j] ? ' on' : ''}" data-c="${L[j]}" title="اضغط لجعلها الإجابة الصحيحة">${L[j]}</span>${q.optSrc ? `<input class="in" dir="auto" data-o="${j}" value="${esc(q.optSrc[j])}" placeholder="الخيار ${L[j]}">` : `<div class="in qc" style="background:var(--g0)">${UI.optHtml(q, j)}</div>`}</div>`).join('')}</div>
+        <div class="row" style="margin-top:6px">${q.options.length < 5 ? '<button class="btn sm ghost" data-a="addopt">+ خيار</button>' : ''}${q.options.length > 2 ? '<button class="btn sm ghost" data-a="rmopt">− خيار</button>' : ''}<span class="small muted">اضغط على الحرف الأخضر لتحديد الإجابة الصحيحة.</span></div>
+        <details style="margin-top:6px"${q.hint || q.solution ? ' open' : ''}><summary class="small" style="cursor:pointer;font-weight:700;color:var(--g8)">تلميح وحل (اختياري)</summary><div class="grid2"><input class="in" dir="auto" data-k="hint" placeholder="تلميح يظهر للطالب عند الطلب" value="${esc(q.hint)}"><input class="in" dir="auto" data-k="solution" placeholder="الحل — يظهر بعد التسليم" value="${esc(q.solution)}"></div></details>
+      </div></div>`; }).join('') || '<div class="empty">لا توجد أسئلة بعد. ارفع ملف Excel أو اضغط «إضافة سؤال».</div>';
+  summary();
+}
+function summary() {
+  const n = E.questions.length, m = E.questions.reduce((s, q) => s + (+q.marks || 0), 0), bad = E.questions.filter(q => problems(q).length).length;
+  $('#qCount').textContent = `الأسئلة (${n})`; $('#qSum').textContent = n ? `${m} درجة${bad ? ` · ${bad} سؤال يحتاج إلى تصحيح` : ''}` : '';
+  $('#sum').innerHTML = `<b>الهدف:</b> ${Catalog.classLabel(E.grade, E.track)} · ${Catalog.subjAr(E.subject)} · ${E.sections.length ? 'الشعب ' + esc(E.sections.join('، ')) : 'كل الشعب'} · ${Catalog.TERM_AR[E.term]}<br><b>الامتحان:</b> ${esc(E.title || '— بلا عنوان —')} · ${n} سؤال · ${m} درجة`;
+}
+const qOf = el => E.questions[+el.closest('.qe').dataset.i];
+$('#qlist').addEventListener('input', e => {
+  const q = qOf(e.target); const k = e.target.dataset.k, o = e.target.dataset.o;
+  if (k === 'stem') q.stemSrc = e.target.value; else if (k) q[k] = k === 'marks' ? +e.target.value : e.target.value;
+  if (o != null) q.optSrc[+o] = e.target.value;
+  const card = e.target.closest('.qe'), pr = problems(q); card.classList.toggle('bad', !!pr.length); const pill = $('.qeh .pill', card); pill.className = 'pill ' + (pr.length ? 'bad' : 'ok'); pill.textContent = pr.length ? pr.join(' · ') : 'جاهز';
+  if (k === 'marks') prefs.marks = q.marks; summary();
+});
+$('#qlist').addEventListener('change', async e => { if (e.target.dataset.a === 'img' && e.target.files[0]) { qOf(e.target).image = await UI.imageToData(e.target.files[0]); drawQs(); } });
+$('#qlist').addEventListener('click', e => {
+  const c = e.target.closest('[data-c]'); if (c) { qOf(c).correct = c.dataset.c; drawQs(); return; }
+  const b = e.target.closest('button[data-a]'); if (!b) return; const i = +b.closest('.qe').dataset.i, q = E.questions[i], a = b.dataset.a;
+  if (a === 'del') E.questions.splice(i, 1);
+  if (a === 'up' && i > 0) [E.questions[i - 1], E.questions[i]] = [E.questions[i], E.questions[i - 1]];
+  if (a === 'down' && i < E.questions.length - 1) [E.questions[i + 1], E.questions[i]] = [E.questions[i], E.questions[i + 1]];
+  if (a === 'dup') E.questions.splice(i + 1, 0, { ...JSON.parse(JSON.stringify(q)), id: newQ().id });
+  if (a === 'rmimg') q.image = '';
+  if (a === 'paste') { pasteTarget = q; UI.toast(`اضغط Ctrl+V الآن للصق صورة في السؤال ${i + 1}.`); return; }
+  if (a === 'totext') { const d = document.createElement('div'); d.innerHTML = q.stem; q.stemSrc = d.innerText.trim(); q.optSrc = q.options.map(o => { d.innerHTML = o; return d.innerText.trim(); }); }
+  if (a === 'addopt') { q.options.push(''); if (q.optSrc) q.optSrc.push(''); }
+  if (a === 'rmopt') { q.options.pop(); if (q.optSrc) q.optSrc.pop(); if (L.indexOf(q.correct) >= q.options.length) q.correct = ''; }
+  drawQs();
+});
+document.addEventListener('paste', async e => {
+  const f = [...(e.clipboardData || {}).items || []].find(x => x.type.startsWith('image/')); if (!f) return;
+  let q = pasteTarget; if (!q) { const card = document.activeElement && document.activeElement.closest && document.activeElement.closest('.qe'); if (card) q = E.questions[+card.dataset.i]; }
+  if (!q) return; e.preventDefault(); q.image = await UI.imageToData(f.getAsFile()); pasteTarget = null; drawQs(); UI.toast('تمت إضافة الصورة.');
+});
+$('#addQ').onclick = () => { E.questions.push(newQ()); drawQs(); setTimeout(() => { const t = $$('#qlist .qe'); t[t.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); const ta = $('textarea', t[t.length - 1]); ta && ta.focus(); }, 50); };
+$('#clearQ').onclick = async () => { if (E.questions.length && await UI.confirmBox('حذف كل الأسئلة من هذا النموذج؟', 'حذف', 'danger')) { E.questions = []; drawQs(); } };
+
+// ------------------------------------------------------------- Excel template + import
+const HEAD = ['رقم Q#', 'نص السؤال Question', 'الخيار A', 'الخيار B', 'الخيار C', 'الخيار D', 'الإجابة الصحيحة Correct (A-D)', 'الدرجة Marks', 'تلميح Hint (اختياري)', 'الحل Solution (اختياري)'];
+$('#tpl').onclick = () => UI.saveXlsx([
+  { name: 'الأسئلة', widths: [8, 60, 22, 22, 22, 22, 16, 10, 30, 40], rows: [HEAD,
+    [1, 'Simplify: (2x^3 + 5x) − (x^3 − 3x)', 'x^3 + 8x', 'x^3 + 2x', '3x^3 + 8x', 'x^3 − 8x', 'A', 3, 'اطرح الحدود المتشابهة', '2x^3 − x^3 = x^3 و 5x + 3x = 8x'],
+    [2, 'ما ناتج [3/4] من 20؟', '12', '15', '16', '5', 'B', 3, '', '[3/4] × 20 = 15']] },
+  { name: 'تعليمات', rtl: true, widths: [100], rows: [['تعليمات تعبئة القالب — منصة ابن حزم'], ['سطر واحد لكل سؤال. لا تغيّر عناوين الأعمدة.'], ['الإجابة الصحيحة حرف واحد: A أو B أو C أو D (يمكن ترك الخيار D فارغًا لسؤال من 3 خيارات).'],
+    ['الرموز: x^2 أُس · a_1 دليل · sqrt(5) جذر · [3/4] كسر · pi = π · <= ≥ · 30deg = 30°'], ['الصور: بعد رفع الملف أضف صورة لأي سؤال بزر «صورة للسؤال» أو بلصقها Ctrl+V.'],
+    ['الصف والمادة والشعب تُختار في الخطوة 1 داخل المنصة.']] }], `IbnHazm_Questions_Template_${E.subject.replace(/\s+/g, '_')}.xlsx`);
+const PROMPT = () => `أنت مساعد لمعلم ${Catalog.subjAr(E.subject)} في مدرسة ابن حزم (${Catalog.classLabel(E.grade, E.track)}).
+أرفقتُ لك: (1) قالب Excel لمنصة التدريب على الاختبارات، (2) ورقة امتحان (PDF أو Word أو صور).
+
+المطلوب: املأ ورقة «الأسئلة» في القالب بكل أسئلة الاختيار من متعدد الموجودة في ورقة الامتحان، ثم أعطني ملف Excel المملوء للتنزيل.
+
+القواعد:
+- سطر واحد لكل سؤال، بنفس ترتيب الامتحان، ولا تغيّر عناوين الأعمدة.
+- انسخ نص السؤال والخيارات كما هي بلغة الامتحان (إن كان السؤال بالإنجليزية والعربية فاكتب الإنجليزي ثم الترجمة العربية في سطر جديد داخل الخلية نفسها).
+- الرموز الرياضية بهذه الطريقة: x^2 للأس، a_1 للدليل، sqrt(5) للجذر، [3/4] للكسر، pi للعدد π، <= و >= للمتباينات، 30deg للدرجات.
+- عمود «الإجابة الصحيحة»: حرف واحد A أو B أو C أو D. حُلّ كل سؤال بنفسك وتأكد من الإجابة؛ إن وجدت مفتاح إجابة في الورقة فقارن به وأخبرني بأي اختلاف.
+- عمود «الدرجة»: درجة السؤال كما في الورقة (وإلا ضع ${prefs.marks || 3}).
+- عمود «الحل»: خطوات حل مختصرة (سطر أو سطران).
+- إذا احتاج سؤال إلى رسم أو صورة، اكتب في عمود «تلميح»: [يحتاج صورة] لأضيفها بنفسي.
+في النهاية أعطني: ملف Excel، وقائمة قصيرة بالأسئلة التي تحتاج صورًا وأي ملاحظات.`;
+$('#prompt').onclick = () => {
+  const p = PROMPT(); const m = UI.modal({ title: '🤖 أمر Claude لتجهيز ملف الأسئلة', wide: true, body: `<ol class="small"><li>نزّل قالب Excel من الزر «تنزيل قالب Excel».</li><li>افتح Claude، أرفق القالب وورقة الامتحان، ثم الصق هذا الأمر وأرسله.</li><li>نزّل الملف المملوء الذي يعطيك إياه Claude وارفعه هنا في الخطوة 2، ثم راجع الأسئلة قبل النشر.</li></ol><textarea class="in" style="min-height:300px;font-size:.9em" readonly>${esc(p)}</textarea>`,
+    foot: [{ text: 'نسخ الأمر', onClick: async c => { try { await navigator.clipboard.writeText(p); UI.toast('تم نسخ الأمر.'); } catch (_) { const t = $('textarea', m.el); t.select(); document.execCommand('copy'); UI.toast('تم نسخ الأمر.'); } c(); } }, { text: 'إغلاق', cls: 'sec' }] });
+};
+const drop = $('#drop'), file = $('#file');
+drop.onclick = () => file.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); }; drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) importFile(e.dataTransfer.files[0]); };
+file.onchange = () => { if (file.files[0]) importFile(file.files[0]); file.value = ''; };
+async function importFile(f) {
+  const msg = $('#parseMsg'); msg.innerHTML = '<div class="notice info">جاري قراءة الملف…</div>';
+  try {
+    const sheets = await UI.readXlsx(f); let got = [], warn = [];
+    for (const sh of sheets) {
+      const hi = sh.rows.findIndex(r => r.some(c => /نص السؤال|question/i.test(c))); if (hi < 0) continue;
+      const h = sh.rows[hi].map(c => String(c));
+      const col = re => h.findIndex(c => re.test(c));
+      const cQ = col(/نص السؤال|question/i), cA = col(/الخيار\s*A|option\s*_?A\b|^A$/i), cB = col(/الخيار\s*B|option\s*_?B\b|^B$/i), cC = col(/الخيار\s*C|option\s*_?C\b|^C$/i), cD = col(/الخيار\s*D|option\s*_?D\b|^D$/i),
+        cK = col(/الصحيحة|correct|answer/i), cM = col(/الدرجة|marks?/i), cH = col(/تلميح|hint/i), cS = col(/الحل|solution|feedback/i);
+      sh.rows.slice(hi + 1).forEach((r, k) => {
+        const stem = String(r[cQ] ?? '').trim(); if (!stem) return;
+        const opts = [cA, cB, cC, cD].map(c => c >= 0 ? String(r[c] ?? '').trim() : '');
+        while (opts.length > 2 && !opts[opts.length - 1]) opts.pop();
+        let key = String(r[cK] ?? '').trim().toUpperCase().replace(/[^A-E1-5أبجده]/g, '');
+        key = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', 'أ': 'A', 'ب': 'B', 'ج': 'C', 'د': 'D' }[key] || key.charAt(0);
+        const q = { ...newQ(), stemSrc: stem, optSrc: opts, options: opts.slice(), correct: L.slice(0, opts.length).includes(key) ? key : '', marks: +r[cM] || prefs.marks || 3, hint: cH >= 0 ? String(r[cH] ?? '').trim() : '', solution: cS >= 0 ? String(r[cS] ?? '').trim() : '' };
+        if (!q.correct) warn.push(`الصف ${hi + k + 2} في ورقة «${sh.name}»: الإجابة الصحيحة غير واضحة`);
+        got.push(q);
+      });
+      if (got.length) break;
+    }
+    if (!got.length) { msg.innerHTML = '<div class="notice err">لم أجد أسئلة في الملف. استخدم قالب المنصة (زر «تنزيل قالب Excel») ولا تغيّر عناوين الأعمدة.</div>'; return; }
+    if (E.questions.length && !(await UI.confirmBox(`في النموذج ${E.questions.length} سؤال حاليًا. هل تريد إضافة أسئلة الملف (${got.length}) بعدها؟ اختر «إلغاء» لاستبدالها.`, 'إضافة بعدها'))) E.questions = [];
+    E.questions.push(...got); drawQs();
+    if (!E.title) { E.title = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '); $('#etitle').value = E.title; summary(); }
+    const needImg = got.filter(q => /يحتاج صورة/.test(q.hint)).length;
+    msg.innerHTML = `<div class="notice ok">تمت قراءة ${got.length} سؤال من «${esc(f.name)}». راجع الأسئلة ثم انشر.</div>` + (warn.length ? `<div class="notice warn">${warn.slice(0, 8).map(esc).join('<br>')}</div>` : '') + (needImg ? `<div class="notice warn">${needImg} سؤال يحتاج صورة — أضفها بزر «صورة للسؤال».</div>` : '');
+  } catch (e) { msg.innerHTML = `<div class="notice err">تعذرت قراءة الملف: ${esc(e.message)}</div>`; }
+}
+
+// ------------------------------------------------------------- step 3: save
+async function saveExam(published) {
+  if (!E.title.trim()) { UI.toast('اكتب عنوان الامتحان.', 'err'); $('#etitle').focus(); return; }
+  if (!E.questions.length) { UI.toast('أضف سؤالًا واحدًا على الأقل.', 'err'); return; }
+  const bad = E.questions.findIndex(q => problems(q).length); if (bad >= 0) { UI.toast(`السؤال ${bad + 1}: ${problems(E.questions[bad]).join('، ')}`, 'err'); $$('#qlist .qe')[bad].scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  const out = { ...E, published, teacher: E.teacher || S.name, questions: E.questions.map(q => ({ ...q,
+    stem: q.stemSrc != null ? UI.fmt(q.stemSrc) : q.stem, options: q.optSrc ? q.optSrc.map(UI.fmt) : q.options })) };
+  $('#pub').disabled = $('#hide').disabled = true;
+  try {
+    const id = await API.saveExam(out); localStorage.setItem('ihz.tprefs', JSON.stringify({ ...prefs, grade: E.grade, track: E.track, subject: E.subject }));
+    UI.modal({ title: published ? '🎉 تم نشر الامتحان' : 'تم حفظ الامتحان', body: `<p>«${esc(E.title)}» ${published ? 'متاح الآن لطلاب' : 'محفوظ (مخفي) لطلاب'} ${Catalog.classLabel(E.grade, E.track)}.</p>`,
+      foot: [{ text: 'معاينة الامتحان', cls: 'sec', onClick: () => window.open('exam.html?preview=1&id=' + encodeURIComponent(id), '_blank') }, { text: 'رفع امتحان آخر', onClick: c => { c(); E = blank(); loadForm(); window.scrollTo(0, 0); } }] });
+    E.id = id; if (mg) mg.reload();
+  } catch (e) { UI.toast(e.message, 'err'); }
+  $('#pub').disabled = $('#hide').disabled = false;
+}
+$('#pub').onclick = () => saveExam(true); $('#hide').onclick = () => saveExam(false);
+$('#newE').onclick = async () => { if (!E.questions.length || await UI.confirmBox('بدء امتحان جديد فارغ؟ لن تُحفظ التغييرات غير المنشورة.', 'نعم')) { E = blank(); loadForm(); } };
+function edit(ex) {
+  E = { ...ex, questions: ex.questions.map(q => ({ ...q })) };
+  $$('.nav button')[0].click(); loadForm(); window.scrollTo(0, 0);
+}
+E = blank(); loadForm();
+const ed = sessionStorage.getItem('ihz.editExam'); if (ed) { sessionStorage.removeItem('ihz.editExam'); try { edit(await API.exam(ed)); } catch (e) { UI.toast(e.message, 'err'); } }
+})();
+</script>
+</body>
+</html>

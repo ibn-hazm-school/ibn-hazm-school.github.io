@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>منصة ابن حزم للتدريب على الاختبارات</title>
+<meta name="description" content="مدرسة ابن حزم – الحلقة الثانية والثالثة · تدرّب على اختبارات نهاية الفصل للصفوف 5–12 في بيئة تحاكي يوم الامتحان.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mrramzy1510-bit.github.io/ibnhazm-exams/">
+<meta property="og:title" content="منصة ابن حزم للتدريب على الاختبارات">
+<meta property="og:description" content="مدرسة ابن حزم – الحلقة الثانية والثالثة · الطلاب والزوار والمعلمون والإدارة">
+<meta property="og:image" content="https://mrramzy1510-bit.github.io/ibnhazm-exams/assets/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3l4.6 9.4L35 14l-7.5 7.3L29.2 32 20 27.1 10.8 32l1.7-10.7L5 14l10.4-1.6z' fill='%23035237'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main class="gate">
+  <section class="gate-hero">
+    <div class="logo-strip"><img src="assets/logo.png" alt="مدرسة ابن حزم — وزارة التربية والتعليم"></div>
+    <span class="term-badge" id="termBadge">العام الدراسي 2026–2027</span>
+    <h1>منصة <span>ابن حزم</span><br>للتدريب على الاختبارات الإلكترونية</h1>
+    <p class="lead">تدرّب على اختبارات نهاية الفصل للصفوف 5–12 في بيئة تحاكي منصة الاختبار يوم الامتحان: مؤقت، قائمة أسئلة، علامة مراجعة، شطب الخيارات، آلة حاسبة، ونتيجة فورية مع مراجعة الإجابات.</p>
+    <div class="features">
+      <div><span class="ic">⏱️</span><span><b>بيئة الامتحان الحقيقية</b>نفس الأدوات والتوقيت</span></div>
+      <div><span class="ic">✅</span><span><b>نتيجة فورية</b>مع الإجابة الصحيحة لكل سؤال</span></div>
+      <div><span class="ic">🔁</span><span><b>تدرّب بلا حدود</b>وتُحفظ أفضل درجة لك</span></div>
+      <div><span class="ic">📊</span><span><b>متابعة المعلمين</b>تقارير Excel لكل صف وشعبة</span></div>
+    </div>
+    <div class="credits">
+      <div><small>مديرة المدرسة</small><b>د. آمنة آل علي</b></div>
+      <div class="by"><small>فكرة وتصميم</small><span>محمد رمزي الحفني</span></div>
+    </div>
+  </section>
+  <section class="gate-side">
+    <div class="school-name">مدرسة ابن حزم – الحلقة الثانية والثالثة<small>Ibn Hazm School – Cycle 2 &amp; 3</small></div>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button class="role on" data-role="student">🎓 الطلاب</button>
+        <button class="role" data-role="guest">🌍 الزوار</button>
+        <button class="role" data-role="teacher">👩‍🏫 المعلمون</button>
+        <button class="role" data-role="admin">🏫 الإدارة</button>
+      </div>
+      <form class="form-panel on" id="f-student" autocomplete="off">
+        <h2>أهلًا بك 👋</h2>
+        <p class="muted" style="margin:0">ادخل برقم الطالب كما هو في السجل المدرسي.</p>
+        <label class="f" for="sid">رقم الطالب</label>
+        <input class="in ltr" id="sid" inputmode="numeric" placeholder="مثال: 784200912345678" style="text-align:center;font-size:1.15em;letter-spacing:.05em">
+        <div class="hint">يمكن كتابة الأرقام بالعربية أو الإنجليزية.</div>
+        <div class="msg"></div>
+        <button class="btn lg block" style="margin-top:12px">دخول</button>
+      </form>
+      <form class="form-panel" id="f-guest" autocomplete="off">
+        <h2>تدرّب على امتحاناتنا</h2>
+        <p class="muted" style="margin:0">اكتب اسمك واختر صفك ومسارك. تُحفظ نتائجك باسمك ولا يراها أحد غيرك.</p>
+        <label class="f" for="gname">اسمك</label>
+        <input class="in" id="gname" placeholder="مثال: أحمد علي" maxlength="40">
+        <div class="grid2">
+          <div><label class="f" for="ggrade">الصف</label><select class="in" id="ggrade"></select></div>
+          <div><label class="f" for="gtrack">المسار</label><select class="in" id="gtrack"></select></div>
+        </div>
+        <div class="msg"></div>
+        <button class="btn lg block gold" style="margin-top:12px">ابدأ التدريب</button>
+      </form>
+      <form class="form-panel" id="f-teacher" autocomplete="off">
+        <h2>بوابة المعلم</h2>
+        <p class="muted" style="margin:0">ارفع امتحانات التدريب وتابع نتائج طلابك.</p>
+        <label class="f" for="tname">اسم المعلم</label>
+        <input class="in" id="tname" placeholder="الاسم الكامل" maxlength="60">
+        <label class="f" for="tpin">رمز المعلمين (4 أرقام)</label>
+        <input class="in ltr" id="tpin" type="password" inputmode="numeric" maxlength="4" style="text-align:center;letter-spacing:.5em;font-size:1.2em">
+        <div class="msg"></div>
+        <button class="btn lg block" style="margin-top:12px">دخول</button>
+      </form>
+      <form class="form-panel" id="f-admin" autocomplete="off">
+        <h2>لوحة الإدارة</h2>
+        <p class="muted" style="margin:0">كل الصفوف والامتحانات والنتائج في مكان واحد.</p>
+        <label class="f" for="apin">رمز الإدارة (4 أرقام)</label>
+        <input class="in ltr" id="apin" type="password" inputmode="numeric" maxlength="4" style="text-align:center;letter-spacing:.5em;font-size:1.2em">
+        <div class="msg"></div>
+        <button class="btn lg block" style="margin-top:12px">دخول</button>
+      </form>
+    </div>
+    <div class="gate-foot">رابط واحد للجميع: الطلاب والزوار والمعلمون والإدارة</div>
+    <div class="gate-foot" id="modeNote"></div>
+  </section>
+</main>
+<script src="js/config.js"></script><script src="js/catalog.js"></script><script src="js/seed-exams.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="js/gate.js"></script>
+</body>
+</html>
